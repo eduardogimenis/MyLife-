@@ -1,18 +1,12 @@
-//
-//  MyLife_App.swift
-//  MyLife!
-//
-//  Created by Eduardo de Castilhos Gimenis on 11/23/25.
-//
-
 import SwiftUI
 import SwiftData
 
 @main
-struct MyLife_App: App {
+struct MyLifeApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            LifeEvent.self,
+            Category.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -26,6 +20,9 @@ struct MyLife_App: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    MigrationManager.shared.performMigration(modelContext: sharedModelContainer.mainContext)
+                }
         }
         .modelContainer(sharedModelContainer)
     }
