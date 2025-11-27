@@ -14,8 +14,9 @@ struct EditCategoryView: View {
     private let availableIcons = [
         // Basics
         "briefcase.fill", "graduationcap.fill", "house.fill", "airplane", "star.fill", "heart.fill",
-        "person.fill", "cart.fill", "gamecontroller.fill", "tv.fill", "music.note", "book.fill",
-        "sportscourt.fill", "car.fill", "leaf.fill", "flame.fill", "bolt.fill", "cross.case.fill",
+        "person.fill", "person.3.fill", "stroller.fill", "cart.fill", "gamecontroller.fill", "tv.fill", 
+        "music.note", "book.fill",
+        "sportscourt.fill", "car.fill", "truck.box.fill", "leaf.fill", "flame.fill", "bolt.fill", "cross.case.fill",
         
         // Pets & Animals
         "pawprint.fill", "cat.fill", "dog.fill", "fish.fill", "bird.fill", "tortoise.fill", 
@@ -26,8 +27,8 @@ struct EditCategoryView: View {
         "snowflake", "mountain.2.fill",
         
         // Activities & Hobbies
-        "figure.run", "figure.walk", "bicycle", "sailboat.fill", "theatermasks.fill", 
-        "paintpalette.fill", "camera.fill", "hammer.fill",
+        "figure.run", "figure.walk", "bicycle", "sailboat.fill", "ferry.fill", "theatermasks.fill", 
+        "paintpalette.fill", "camera.fill", "hammer.fill", "tent.fill", "binoculars.fill",
         
         // Food & Drink
         "fork.knife", "cup.and.saucer.fill", "wineglass.fill", "birthday.cake.fill",

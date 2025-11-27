@@ -88,7 +88,7 @@ struct SettingsView: View {
                             Label("Version", systemImage: "info.circle")
                                 .foregroundColor(themeManager.contrastingTextColor)
                             Spacer()
-                            Text("1.0.0")
+                            Text("0.2.0")
                                 .foregroundColor(themeManager.contrastingTextColor.opacity(0.7))
                         }
                     }
