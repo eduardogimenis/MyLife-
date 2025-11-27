@@ -19,9 +19,15 @@ struct EventCard: View {
                         .foregroundColor(themeManager.contrastingTextColor.opacity(0.6))
                 }
                 
-                Text(event.date.formatted(date: .abbreviated, time: .omitted))
-                    .font(.caption2)
-                    .foregroundColor(Color.theme.accent)
+                if let endDate = event.endDate {
+                    Text("\(event.date.formatted(date: .abbreviated, time: .omitted)) - \(endDate.formatted(date: .abbreviated, time: .omitted))")
+                        .font(.caption2)
+                        .foregroundColor(Color.theme.accent)
+                } else {
+                    Text(event.date.formatted(date: .abbreviated, time: .omitted))
+                        .font(.caption2)
+                        .foregroundColor(Color.theme.accent)
+                }
                 
                 // Photo Thumbnail
                 if showThumbnails, let photoID = event.photoID {

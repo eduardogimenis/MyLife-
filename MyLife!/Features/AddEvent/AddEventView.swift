@@ -11,6 +11,8 @@ struct AddEventView: View {
     
     @State private var title = ""
     @State private var date = Date()
+    @State private var endDate = Date()
+    @State private var isRange = false
     @State private var isApproximate = false
     @State private var selectedCategory: Category?
     @State private var locationName = ""
@@ -35,6 +37,13 @@ struct AddEventView: View {
                     TextField("Title", text: $title)
                     
                     DatePicker("Date", selection: $date, displayedComponents: .date)
+                    
+                    Toggle("Date Range", isOn: $isRange)
+                        .tint(Color.theme.accent)
+                    
+                    if isRange {
+                        DatePicker("End Date", selection: $endDate, displayedComponents: .date)
+                    }
                     
                     Toggle("Approximate Date", isOn: $isApproximate)
                         .tint(Color.theme.accent)
@@ -152,6 +161,10 @@ struct AddEventView: View {
             if let event = eventToEdit {
                 title = event.title
                 date = event.date
+                if let end = event.endDate {
+                    endDate = end
+                    isRange = true
+                }
                 isApproximate = event.isApproximate
                 selectedCategory = event.categoryModel
                 locationName = event.locationName ?? ""
@@ -188,6 +201,7 @@ struct AddEventView: View {
             // Update existing event
             event.title = title
             event.date = date
+            event.endDate = isRange ? endDate : nil
             event.isApproximate = isApproximate
             event.categoryModel = selectedCategory
             // Keep raw value in sync for now, or just ignore it
@@ -205,6 +219,7 @@ struct AddEventView: View {
             let newEvent = LifeEvent(
                 title: title,
                 date: date,
+                endDate: isRange ? endDate : nil,
                 isApproximate: isApproximate,
                 category: .event, // Placeholder
                 notes: notes.isEmpty ? nil : notes,

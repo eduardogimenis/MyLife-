@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MainTabView: View {
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var tourManager: TourManager
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @State private var selectedTab = 0
     @State private var tourStep = 0
@@ -20,7 +21,7 @@ struct MainTabView: View {
         UINavigationBar.appearance().compactAppearance = navBarAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = navBarAppearance
     }
-
+    
     var body: some View {
         ZStack {
             TabView(selection: $selectedTab) {
@@ -124,11 +125,62 @@ struct MainTabView: View {
                 }
                 .padding(.bottom, 60) // Lift above tab bar slightly
             }
+            // Contextual Tour Prompt
+            if tourManager.showTourPrompt {
+                Color.black.opacity(0.6)
+                    .ignoresSafeArea()
+                    .onTapGesture { } // Block touches
+                
+                VStack(spacing: 20) {
+                    Image(systemName: "lightbulb.fill")
+                        .font(.system(size: 50))
+                        .foregroundColor(.yellow)
+                    
+                    Text("Setup Complete!")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                    
+                    Text("Would you like to learn how to customize your experience with Categories and People?")
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal)
+                    
+                    HStack(spacing: 20) {
+                        Button("No thanks") {
+                            withAnimation {
+                                tourManager.showTourPrompt = false
+                            }
+                        }
+                        .foregroundColor(.secondary)
+                        
+                        Button("Show me") {
+                            withAnimation {
+                                tourManager.startTour()
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                    .padding(.top, 10)
+                }
+                .padding(30)
+                .background(
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(Color(uiColor: .systemBackground))
+                        .shadow(radius: 10)
+                )
+                .padding(40)
+                .transition(.scale.combined(with: .opacity))
+            }
+        }
+        .onChange(of: tourManager.navigateToSettings) { newValue in
+            if newValue {
+                selectedTab = 3
+            }
         }
     }
+    
+    
+    #Preview {
+        MainTabView()
     }
-
-
-#Preview {
-    MainTabView()
 }

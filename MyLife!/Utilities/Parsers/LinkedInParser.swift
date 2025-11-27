@@ -28,6 +28,12 @@ class LinkedInParser {
             let location = row["Location"]
             let eventTitle = "\(title) at \(company)"
             
+            // Parse End Date
+            var endDate: Date? = nil
+            if let endDateString = row["Finished On"], !endDateString.isEmpty {
+                endDate = dateFormatter.date(from: endDateString)
+            }
+            
             // Check for duplicates
             if eventExists(title: eventTitle, date: startDate, context: context) {
                 result.duplicateCount += 1
@@ -37,6 +43,7 @@ class LinkedInParser {
             let newEvent = LifeEvent(
                 title: eventTitle,
                 date: startDate,
+                endDate: endDate,
                 isApproximate: false,
                 category: .work,
                 notes: description,
@@ -71,6 +78,12 @@ class LinkedInParser {
             let degree = row["Degree Name"] ?? ""
             let notes = row["Notes"]
             
+            // Parse End Date
+            var endDate: Date? = nil
+            if let endDateString = row["End Date"], !endDateString.isEmpty {
+                endDate = dateFormatter.date(from: endDateString)
+            }
+            
             let title = degree.isEmpty ? school : "\(degree) at \(school)"
             
             // Check for duplicates
@@ -82,6 +95,7 @@ class LinkedInParser {
             let newEvent = LifeEvent(
                 title: title,
                 date: startDate,
+                endDate: endDate,
                 isApproximate: true, // Year only is usually approximate
                 category: .education,
                 notes: notes,

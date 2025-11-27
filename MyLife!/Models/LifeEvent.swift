@@ -6,6 +6,7 @@ import SwiftUI
 final class LifeEvent {
     var title: String
     var date: Date
+    var endDate: Date?
     var isApproximate: Bool
     var categoryRawValue: String
     var notes: String?
@@ -21,9 +22,10 @@ final class LifeEvent {
         set { categoryRawValue = newValue.rawValue }
     }
     
-    init(title: String, date: Date, isApproximate: Bool = false, category: EventCategory = .event, notes: String? = nil, locationName: String? = nil, photoID: String? = nil, externalLink: URL? = nil, categoryModel: Category? = nil, people: [Person]? = nil) {
+    init(title: String, date: Date, endDate: Date? = nil, isApproximate: Bool = false, category: EventCategory = .event, notes: String? = nil, locationName: String? = nil, photoID: String? = nil, externalLink: URL? = nil, categoryModel: Category? = nil, people: [Person]? = nil) {
         self.title = title
         self.date = date
+        self.endDate = endDate
         self.isApproximate = isApproximate
         self.categoryRawValue = category.rawValue
         self.notes = notes

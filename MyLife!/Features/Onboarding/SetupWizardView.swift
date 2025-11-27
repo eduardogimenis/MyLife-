@@ -4,6 +4,7 @@ import SwiftData
 struct SetupWizardView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject var tourManager: TourManager
     
     enum Step {
         case birth
@@ -79,6 +80,7 @@ struct SetupWizardView: View {
                         .buttonStyle(.borderedProminent)
                     } else {
                         Button("View Timeline") {
+                            tourManager.triggerPostSetupTour()
                             dismiss()
                         }
                         .buttonStyle(.borderedProminent)

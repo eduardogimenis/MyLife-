@@ -4,6 +4,7 @@ import SwiftData
 @main
 struct MyLife_App: App {
     @StateObject private var themeManager = ThemeManager()
+    @StateObject private var tourManager = TourManager.shared
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -24,6 +25,7 @@ struct MyLife_App: App {
         WindowGroup {
             ContentView()
                 .environmentObject(themeManager)
+                .environmentObject(tourManager)
         }
         .modelContainer(sharedModelContainer)
     }
