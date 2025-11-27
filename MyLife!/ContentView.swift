@@ -1,12 +1,19 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.modelContext) var modelContext
+    
     var body: some View {
         MainTabView()
-            .preferredColorScheme(.dark) // Enforce dark mode for MVP as per spec
+            .preferredColorScheme(themeManager.contrastingTextColor == .black ? .light : .dark)
+            .onAppear {
+                MigrationManager.shared.performMigration(modelContext: modelContext)
+            }
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(ThemeManager())
 }

@@ -5,6 +5,8 @@ struct TimelineNode: View {
     let category: Category?
     let fallbackCategory: EventCategory
     
+    @EnvironmentObject var themeManager: ThemeManager
+    
     init(isApproximate: Bool, category: Category?, fallbackCategory: EventCategory = .event) {
         self.isApproximate = isApproximate
         self.category = category
@@ -27,7 +29,7 @@ struct TimelineNode: View {
                 .frame(width: 12, height: 12)
                 .overlay(
                     Circle()
-                        .stroke(Color.theme.background, lineWidth: 2)
+                        .stroke(themeManager.customBackgroundColor, lineWidth: 2)
                 )
         }
         .frame(width: 40) // Fixed width for alignment

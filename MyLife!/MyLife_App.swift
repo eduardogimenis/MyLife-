@@ -2,11 +2,14 @@ import SwiftUI
 import SwiftData
 
 @main
-struct MyLifeApp: App {
+struct MyLife_App: App {
+    @StateObject private var themeManager = ThemeManager()
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             LifeEvent.self,
             Category.self,
+            Person.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -20,9 +23,7 @@ struct MyLifeApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .onAppear {
-                    MigrationManager.shared.performMigration(modelContext: sharedModelContainer.mainContext)
-                }
+                .environmentObject(themeManager)
         }
         .modelContainer(sharedModelContainer)
     }

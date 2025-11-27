@@ -1,26 +1,7 @@
-import Foundation
-import SwiftData
 import SwiftUI
+import UIKit
 
-@Model
-final class Category {
-    @Attribute(.unique) var name: String
-    var colorHex: String
-    var iconName: String
-    var isSystemDefault: Bool
-    
-    init(name: String, colorHex: String, iconName: String, isSystemDefault: Bool = false) {
-        self.name = name
-        self.colorHex = colorHex
-        self.iconName = iconName
-        self.isSystemDefault = isSystemDefault
-    }
-    
-    var color: Color {
-        Color(hex: colorHex) ?? .gray
-    }
-}
-
+// Paste the extension code here for testing
 extension Color {
     init?(hex: String) {
         var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -62,27 +43,34 @@ extension Color {
         var b: CGFloat = 0
         var a: CGFloat = 0
         
-        // Try getting components directly
-        if uic.getRed(&r, green: &g, blue: &b, alpha: &a) {
-            return hexString(r: r, g: g, b: b, a: a)
+        guard uic.getRed(&r, green: &g, blue: &b, alpha: &a) else {
+            return nil
         }
         
-        // If that fails, try converting to sRGB
-        if let cgColor = uic.cgColor.converted(to: CGColorSpace(name: CGColorSpace.sRGB)!, intent: .defaultIntent, options: nil) {
-            let srgbColor = UIColor(cgColor: cgColor)
-            if srgbColor.getRed(&r, green: &g, blue: &b, alpha: &a) {
-                return hexString(r: r, g: g, b: b, a: a)
-            }
-        }
-        
-        return nil
-    }
-    
-    private func hexString(r: CGFloat, g: CGFloat, b: CGFloat, a: CGFloat) -> String {
         if a != 1.0 {
             return String(format: "%02lX%02lX%02lX%02lX", lroundf(Float(r) * 255), lroundf(Float(g) * 255), lroundf(Float(b) * 255), lroundf(Float(a) * 255))
         } else {
             return String(format: "%02lX%02lX%02lX", lroundf(Float(r) * 255), lroundf(Float(g) * 255), lroundf(Float(b) * 255))
         }
     }
+}
+
+// Test logic
+let red = Color.red
+let custom = Color(red: 0.5, green: 0.2, blue: 0.8)
+
+if let hexRed = red.toHex() {
+    print("Red Hex: \(hexRed)")
+    let redBack = Color(hex: hexRed)
+    print("Red Back: \(String(describing: redBack))")
+} else {
+    print("Failed to convert Red to Hex")
+}
+
+if let hexCustom = custom.toHex() {
+    print("Custom Hex: \(hexCustom)")
+    let customBack = Color(hex: hexCustom)
+    print("Custom Back: \(String(describing: customBack))")
+} else {
+    print("Failed to convert Custom to Hex")
 }

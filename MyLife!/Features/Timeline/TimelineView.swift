@@ -3,33 +3,61 @@ import SwiftData
 
 struct TimelineView: View {
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject var themeManager: ThemeManager
     @Query(sort: \LifeEvent.date, order: .reverse) private var events: [LifeEvent]
     
     @State private var showingAddEvent = false
+    @State private var showingSetupWizard = false
     @State private var selectedEvent: LifeEvent?
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
-                Color.theme.background.ignoresSafeArea()
+                // Background handled locally to ensure visibility
+                themeManager.backgroundView() 
                 
                 if events.isEmpty {
-                    ContentUnavailableView("No Events", systemImage: "clock", description: Text("Add your first life event or load sample data."))
-                        .toolbar {
-                            ToolbarItem(placement: .topBarTrailing) {
-                                Button("Load Mock Data") {
-                                    loadMockData()
-                                }
-                            }
-                            ToolbarItem(placement: .topBarLeading) {
-                                Button(action: { showingAddEvent = true }) {
-                                    Image(systemName: "plus")
-                                }
+                    VStack(spacing: 20) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 60))
+                            .foregroundColor(themeManager.accentColor)
+                            .padding(.bottom, 10)
+                        
+                        Text("Welcome to your Timeline")
+                            .font(.system(.title2, design: themeManager.fontDesign))
+                            .fontWeight(.bold)
+                            .foregroundColor(themeManager.contrastingTextColor)
+                        
+                        Text("It looks a bit empty. Let's add your major milestones.")
+                            .font(.system(.body, design: themeManager.fontDesign))
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(themeManager.contrastingTextColor.opacity(0.8))
+                            .padding(.horizontal)
+                        
+                        Button("Start Setup") {
+                            showingSetupWizard = true
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(themeManager.accentColor)
+                        .padding(.top, 10)
+                        
+                        Button("Load Mock Data") {
+                            loadMockData()
+                        }
+                        .font(.caption)
+                        .foregroundColor(themeManager.contrastingTextColor.opacity(0.6))
+                        .padding(.top, 20)
+                    }
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button(action: { showingAddEvent = true }) {
+                                Image(systemName: "plus")
                             }
                         }
+                    }
                 } else {
                     ScrollView {
-                        LazyVStack(spacing: 0) {
+                        LazyVStack(spacing: themeManager.timelineDensity == .compact ? 0 : 16) {
                             ForEach(events) { event in
                                 HStack(alignment: .top, spacing: 0) {
                                     // Time Column (Year)
@@ -44,13 +72,13 @@ struct TimelineView: View {
                                             Rectangle()
                                                 .fill(Color.gray.opacity(0.3))
                                                 .frame(width: 2)
-                                                .frame(minHeight: 40)
+                                                .frame(minHeight: themeManager.timelineDensity == .compact ? 20 : 40)
                                         }
                                     }
                                     
                                     // Content Column
                                     EventCard(event: event)
-                                        .padding(.bottom, 20)
+                                        .padding(.bottom, themeManager.timelineDensity == .compact ? 8 : 20)
                                         .padding(.leading, 8)
                                         .contentShape(Rectangle()) // Make entire card area tappable
                                         .onTapGesture {
@@ -75,7 +103,9 @@ struct TimelineView: View {
                         }
                         .padding(.top)
                     }
+                    .scrollContentBackground(.hidden) // Ensure ScrollView is transparent
                     .navigationTitle("MyLife!")
+                    .toolbarColorScheme(themeManager.contrastingTextColor == .white ? .dark : .light, for: .navigationBar)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             Button(action: { showingAddEvent = true }) {
@@ -85,8 +115,13 @@ struct TimelineView: View {
                     }
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.clear)
             .sheet(isPresented: $showingAddEvent) {
                 AddEventView()
+            }
+            .sheet(isPresented: $showingSetupWizard) {
+                SetupWizardView()
             }
             .sheet(item: $selectedEvent) { event in
                 AddEventView(eventToEdit: event)

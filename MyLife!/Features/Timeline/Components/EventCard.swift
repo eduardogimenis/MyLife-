@@ -2,6 +2,7 @@ import SwiftUI
 
 struct EventCard: View {
     let event: LifeEvent
+    @EnvironmentObject var themeManager: ThemeManager
     @AppStorage("showThumbnails") private var showThumbnails = true
     
     var body: some View {
@@ -10,12 +11,12 @@ struct EventCard: View {
                 Text(event.title)
                     .font(.headline)
                     .fontWeight(.semibold)
-                    .foregroundColor(.white)
+                    .foregroundColor(themeManager.contrastingTextColor)
                 
                 if let location = event.locationName {
                     Text(location)
                         .font(.captionText)
-                        .foregroundColor(.gray)
+                        .foregroundColor(themeManager.contrastingTextColor.opacity(0.6))
                 }
                 
                 Text(event.date.formatted(date: .abbreviated, time: .omitted))

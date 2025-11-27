@@ -1,44 +1,133 @@
 import SwiftUI
 
 struct MainTabView: View {
+    @EnvironmentObject var themeManager: ThemeManager
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
-    @State private var showOnboarding = false
+    @State private var selectedTab = 0
+    @State private var tourStep = 0
     
+    init() {
+        // Make TabBar transparent
+        let tabBarAppearance = UITabBarAppearance()
+        tabBarAppearance.configureWithTransparentBackground()
+        UITabBar.appearance().standardAppearance = tabBarAppearance
+        UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+        
+        // Make NavigationBar transparent
+        let navBarAppearance = UINavigationBarAppearance()
+        navBarAppearance.configureWithTransparentBackground()
+        UINavigationBar.appearance().standardAppearance = navBarAppearance
+        UINavigationBar.appearance().compactAppearance = navBarAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = navBarAppearance
+    }
+
     var body: some View {
-        TabView {
-            TimelineView()
-                .tabItem {
-                    Label("Timeline", systemImage: "clock.arrow.circlepath")
-                }
+        ZStack {
+            TabView(selection: $selectedTab) {
+                TimelineView()
+                    .tabItem {
+                        Label("Timeline", systemImage: "clock.arrow.circlepath")
+                    }
+                    .tag(0)
+                
+                GalleryView()
+                    .tabItem {
+                        Label("Gallery", systemImage: "photo.stack")
+                    }
+                    .tag(1)
+                
+                SearchView()
+                    .tabItem {
+                        Label("Search", systemImage: "magnifyingglass")
+                    }
+                    .tag(2)
+                
+                SettingsView()
+                    .tabItem {
+                        Label("Settings", systemImage: "gear")
+                    }
+                    .tag(3)
+            }
+            .tint(themeManager.accentColor)
+            .background(themeManager.backgroundView())
             
-            GalleryView()
-                .tabItem {
-                    Label("Gallery", systemImage: "photo.stack")
-                }
-            
-            SearchView()
-                .tabItem {
-                    Label("Search", systemImage: "magnifyingglass")
-                }
-            
-            SettingsView()
-                .tabItem {
-                    Label("Settings", systemImage: "gear")
-                }
-        }
-        .onAppear {
+            // Contextual Tour Overlay
             if !hasSeenOnboarding {
-                showOnboarding = true
+                Color.black.opacity(0.4)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        // Prevent dismissing by tapping background, force user to interact with card
+                    }
+                
+                VStack {
+                    Spacer()
+                    
+                    switch tourStep {
+                    case 0:
+                        TourCard(
+                            title: "Welcome to MyLife!",
+                            description: "The private place for your life's story. Capture memories, milestones, and the people who matter most.",
+                            iconName: "heart.text.square",
+                            buttonTitle: "Start Tour"
+                        ) {
+                            withAnimation {
+                                tourStep = 1
+                            }
+                        }
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        
+                    case 1:
+                        TourCard(
+                            title: "Timeline",
+                            description: "Your life story in a continuous stream. Visualize your history in a beautiful list.",
+                            iconName: "clock.arrow.circlepath",
+                            buttonTitle: "Next"
+                        ) {
+                            withAnimation {
+                                selectedTab = 1
+                                tourStep = 2
+                            }
+                        }
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        
+                    case 2:
+                        TourCard(
+                            title: "Gallery",
+                            description: "All your memories in one place. Browse your photos by year, category, or people.",
+                            iconName: "photo.stack",
+                            buttonTitle: "Next"
+                        ) {
+                            withAnimation {
+                                selectedTab = 2
+                                tourStep = 3
+                            }
+                        }
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        
+                    case 3:
+                        TourCard(
+                            title: "Search",
+                            description: "Find any moment instantly. Filter by text, category, or the people involved.",
+                            iconName: "magnifyingglass",
+                            buttonTitle: "Finish"
+                        ) {
+                            withAnimation {
+                                hasSeenOnboarding = true
+                                selectedTab = 0 // Return to timeline to start using the app
+                            }
+                        }
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        
+                    default:
+                        EmptyView()
+                    }
+                }
+                .padding(.bottom, 60) // Lift above tab bar slightly
             }
         }
-        .sheet(isPresented: $showOnboarding, onDismiss: {
-            hasSeenOnboarding = true
-        }) {
-            WelcomeView(isPresented: $showOnboarding)
-                .interactiveDismissDisabled()
-        }
     }
-}
+    }
+
 
 #Preview {
     MainTabView()

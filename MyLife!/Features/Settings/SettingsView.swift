@@ -3,41 +3,62 @@ import SwiftData
 import UniformTypeIdentifiers
 
 struct SettingsView: View {
+    @EnvironmentObject var themeManager: ThemeManager
     @AppStorage("showThumbnails") private var showThumbnails = true
     
     var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Timeline Appearance")) {
-                    Toggle("Show Event Thumbnails", isOn: $showThumbnails)
-                        .tint(Color.theme.accent)
-                }
+        NavigationStack {
+            ZStack {
+                themeManager.backgroundView()
                 
-                Section(header: Text("Data Management")) {
-                    NavigationLink(destination: CategoryListView()) {
-                        Label("Manage Categories", systemImage: "tag")
+                Form {
+                    Section(header: Text("Timeline Appearance").foregroundColor(themeManager.contrastingTextColor)) {
+                        NavigationLink(destination: AppearanceSettingsView()) {
+                            Label("Appearance", systemImage: "paintpalette")
+                                .foregroundColor(themeManager.contrastingTextColor)
+                        }
+                        
+                        Toggle("Show Event Thumbnails", isOn: $showThumbnails)
+                            .tint(Color.theme.accent)
+                            .foregroundColor(themeManager.contrastingTextColor)
                     }
+                    .listRowBackground(Color.clear) // Make rows transparent
                     
-                    NavigationLink(destination: PeopleListView()) {
-                        Label("Manage People", systemImage: "person.2")
+                    Section(header: Text("Data Management").foregroundColor(themeManager.contrastingTextColor)) {
+                        NavigationLink(destination: CategoryListView()) {
+                            Label("Manage Categories", systemImage: "tag")
+                                .foregroundColor(themeManager.contrastingTextColor)
+                        }
+                        
+                        NavigationLink(destination: PeopleListView()) {
+                            Label("Manage People", systemImage: "person.2")
+                                .foregroundColor(themeManager.contrastingTextColor)
+                        }
+                        
+                        NavigationLink(destination: DataManagementView()) {
+                            Text("Import / Export JSON")
+                                .foregroundColor(themeManager.contrastingTextColor)
+                        }
                     }
+                    .listRowBackground(Color.clear)
                     
-                    NavigationLink("Import / Export JSON") {
-                        DataManagementView()
+                    Section(header: Text("About").foregroundColor(themeManager.contrastingTextColor)) {
+                        HStack {
+                            Text("Version")
+                                .foregroundColor(themeManager.contrastingTextColor)
+                            Spacer()
+                            Text("1.0.0")
+                                .foregroundColor(themeManager.contrastingTextColor.opacity(0.7))
+                        }
                     }
+                    .listRowBackground(Color.clear)
                 }
-                
-                Section(header: Text("About")) {
-                    HStack {
-                        Text("Version")
-                        Spacer()
-                        Text("1.0.0")
-                            .foregroundColor(.secondary)
-                    }
-                }
+                .scrollContentBackground(.hidden)
             }
             .navigationTitle("Settings")
+            .toolbarColorScheme(themeManager.contrastingTextColor == .white ? .dark : .light, for: .navigationBar)
         }
+        .background(Color.clear)
     }
 }
 

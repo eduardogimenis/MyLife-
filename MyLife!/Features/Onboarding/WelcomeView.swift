@@ -7,20 +7,26 @@ struct WelcomeView: View {
         TabView {
             OnboardingPage(
                 imageName: "clock.arrow.circlepath",
-                title: "Welcome to MyLife!",
-                description: "Your personal timeline for life's most important moments. Visualize your history in a beautiful, continuous stream."
+                title: "Timeline",
+                description: "Your life story in a continuous stream. Visualize your history in a beautiful, reverse-chronological list."
             )
             
             OnboardingPage(
-                imageName: "square.and.arrow.down",
-                title: "Import Your Data",
-                description: "Easily bring in your history from LinkedIn, Instagram, or any CSV file. Your data belongs to you."
+                imageName: "photo.stack",
+                title: "Gallery",
+                description: "All your memories in one place. Browse your photos by year, category, or people."
             )
             
             OnboardingPage(
                 imageName: "magnifyingglass",
-                title: "Rediscover Memories",
-                description: "Search, filter, and explore your past. Tap 'Get Started' to begin your journey.",
+                title: "Search",
+                description: "Find any moment instantly. Filter by text, category, or the people involved."
+            )
+            
+            OnboardingPage(
+                imageName: "star.fill",
+                title: "Get Started",
+                description: "Ready to build your timeline? Let's begin your journey.",
                 showButton: true,
                 action: {
                     isPresented = false
