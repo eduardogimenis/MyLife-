@@ -49,6 +49,44 @@ class ThemeManager: ObservableObject {
         }
     }
     
+    enum AppDynamicTypeSize: String, CaseIterable, Identifiable {
+        case small, medium, large, xLarge, xxLarge, xxxLarge
+        var id: String { rawValue }
+        
+        var size: DynamicTypeSize {
+            switch self {
+            case .small: return .small
+            case .medium: return .medium
+            case .large: return .large
+            case .xLarge: return .xLarge
+            case .xxLarge: return .xxLarge
+            case .xxxLarge: return .xxxLarge
+            }
+        }
+        
+        var label: String {
+            switch self {
+            case .small: return "A"
+            case .medium: return "A"
+            case .large: return "A"
+            case .xLarge: return "A"
+            case .xxLarge: return "A"
+            case .xxxLarge: return "A"
+            }
+        }
+        
+        var fontSize: CGFloat {
+            switch self {
+            case .small: return 14
+            case .medium: return 16
+            case .large: return 20
+            case .xLarge: return 24
+            case .xxLarge: return 28
+            case .xxxLarge: return 32
+            }
+        }
+    }
+    
     // MARK: - Published Properties
     
     // MARK: - Properties backed by UserDefaults
@@ -106,6 +144,14 @@ class ThemeManager: ObservableObject {
         set {
             objectWillChange.send()
             UserDefaults.standard.set(newValue, forKey: "appFontDesign")
+        }
+    }
+    
+    var dynamicTypeSizeRaw: String {
+        get { UserDefaults.standard.string(forKey: "appDynamicTypeSize") ?? AppDynamicTypeSize.large.rawValue }
+        set {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue, forKey: "appDynamicTypeSize")
         }
     }
     
@@ -240,6 +286,10 @@ class ThemeManager: ObservableObject {
     
     var fontDesign: Font.Design {
         FontDesign(rawValue: fontDesignRaw)?.design ?? .rounded
+    }
+    
+    var dynamicTypeSize: DynamicTypeSize {
+        AppDynamicTypeSize(rawValue: dynamicTypeSizeRaw)?.size ?? .large
     }
     
 

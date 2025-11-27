@@ -88,6 +88,30 @@ struct AppearanceSettingsView: View {
                             Text(design.rawValue.capitalized).tag(design.rawValue)
                         }
                     }
+                    
+                    VStack(alignment: .leading) {
+                        Text("Text Size")
+                        HStack {
+                            ForEach(ThemeManager.AppDynamicTypeSize.allCases) { size in
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(themeManager.dynamicTypeSizeRaw == size.rawValue ? Color.theme.accent.opacity(0.2) : Color.clear)
+                                    
+                                    Text(size.label)
+                                        .font(.system(size: size.fontSize))
+                                        .fontWeight(themeManager.dynamicTypeSizeRaw == size.rawValue ? .bold : .regular)
+                                        .foregroundColor(themeManager.contrastingTextColor)
+                                }
+                                .frame(height: 50)
+                                .onTapGesture {
+                                    withAnimation {
+                                        themeManager.dynamicTypeSizeRaw = size.rawValue
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .padding(.vertical, 4)
                 }
                 .listRowBackground(Color.clear)
                 

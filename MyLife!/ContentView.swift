@@ -8,6 +8,7 @@ struct ContentView: View {
         MainTabView()
             .preferredColorScheme(themeManager.contrastingTextColor == .black ? .light : .dark)
             .fontDesign(themeManager.fontDesign)
+            .dynamicTypeSize(themeManager.dynamicTypeSize)
             .onAppear {
                 MigrationManager.shared.performMigration(modelContext: modelContext)
             }
