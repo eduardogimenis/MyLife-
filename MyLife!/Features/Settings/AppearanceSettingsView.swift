@@ -50,11 +50,12 @@ struct AppearanceSettingsView: View {
                     }
                     
                     if themeManager.backgroundStyle == .image {
+                        let hasBackgroundImage = themeManager.backgroundImage != nil
                         PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
                             HStack {
                                 Label("Select Photo", systemImage: "photo")
                                 Spacer()
-                                if themeManager.backgroundImage != nil {
+                                if hasBackgroundImage {
                                     Text("Change")
                                         .foregroundColor(.secondary)
                                 }
@@ -70,7 +71,20 @@ struct AppearanceSettingsView: View {
                         }
                         
                         if themeManager.backgroundImage != nil {
-                            Toggle("Blur Background", isOn: $themeManager.isBackgroundBlurred)
+                            VStack(alignment: .leading) {
+                                Text("Blur: \(Int(themeManager.backgroundBlurRadius))")
+                                Slider(value: $themeManager.backgroundBlurRadius, in: 0...20, step: 1)
+                            }
+                            
+                            VStack(alignment: .leading) {
+                                Text("Tint Opacity: \(Int(themeManager.backgroundTintOpacity * 100))%")
+                                Slider(value: $themeManager.backgroundTintOpacity, in: 0...1)
+                            }
+                            
+                            ColorPicker("Tint Color", selection: Binding(
+                                get: { themeManager.backgroundTintColor },
+                                set: { themeManager.setBackgroundTintColor($0) }
+                            ))
                             
                             Button(role: .destructive) {
                                 themeManager.deleteBackgroundImage()

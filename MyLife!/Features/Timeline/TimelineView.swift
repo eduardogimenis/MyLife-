@@ -10,6 +10,24 @@ struct TimelineView: View {
     @State private var showingSetupWizard = false
     @State private var selectedEvent: LifeEvent?
     
+    var groupedEvents: [(Int, [(String, [LifeEvent])])] {
+        let groupedByYear = Dictionary(grouping: events) { event in
+            Calendar.current.component(.year, from: event.date)
+        }
+        
+        return groupedByYear.sorted { $0.key > $1.key }.map { year, yearEvents in
+            let groupedByMonth = Dictionary(grouping: yearEvents) { event in
+                event.date.formatted(.dateTime.month(.wide))
+            }
+            let sortedMonths = groupedByMonth.sorted {
+                let date1 = $0.value.first?.date ?? Date()
+                let date2 = $1.value.first?.date ?? Date()
+                return date1 > date2
+            }
+            return (year, sortedMonths)
+        }
+    }
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -57,45 +75,57 @@ struct TimelineView: View {
                         }
                     } else {
                         ScrollView {
-                            LazyVStack(spacing: themeManager.timelineDensity == .compact ? 0 : 16) {
-                                ForEach(events) { event in
-                                    HStack(alignment: .top, spacing: 0) {
-                                        // Node Column
-                                        VStack(spacing: 0) {
-                                            TimelineNode(isApproximate: event.isApproximate, category: event.categoryModel, fallbackCategory: event.category)
-                                            
-                                            // Connector Line
-                                            if event != events.last {
-                                                Rectangle()
-                                                    .fill(Color.gray.opacity(0.3))
-                                                    .frame(width: 2)
-                                                    .frame(minHeight: themeManager.timelineDensity == .compact ? 20 : 40)
+                            VStack(spacing: 0) {
+                                ForEach(groupedEvents, id: \.0) { year, months in
+                                    VStack(alignment: .leading, spacing: 0) {
+                                        // Year Header
+                                        Text(String(year))
+                                            .font(.system(.title2, design: .rounded))
+                                            .fontWeight(.bold)
+                                            .foregroundColor(themeManager.contrastingTextColor)
+                                            .padding(.horizontal)
+                                            .padding(.top, 24)
+                                            .padding(.bottom, 8)
+                                        
+                                        ForEach(months, id: \.0) { month, monthEvents in
+                                            VStack(alignment: .leading, spacing: 0) {
+                                                // Month Header
+                                                Text(month)
+                                                    .font(.subheadline)
+                                                    .fontWeight(.medium)
+                                                    .foregroundColor(themeManager.accentColor)
+                                                    .padding(.horizontal)
+                                                    .padding(.top, 8)
+                                                    .padding(.bottom, 12)
+                                                
+                                                ForEach(monthEvents) { event in
+                                                    NavigationLink(destination: EventDetailView(event: event)) {
+                                                        HStack(alignment: .top, spacing: 0) {
+                                                            // Node Column
+                                                            VStack(spacing: 0) {
+                                                                TimelineNode(isApproximate: event.isApproximate, category: event.categoryModel, fallbackCategory: event.category)
+                                                                
+                                                                // Connector Line
+                                                                if event != monthEvents.last || month != months.last?.0 {
+                                                                    Rectangle()
+                                                                        .fill(Color.gray.opacity(0.3))
+                                                                        .frame(width: 2)
+                                                                        .frame(minHeight: themeManager.timelineDensity == .compact ? 20 : 40)
+                                                                }
+                                                            }
+                                                            
+                                                            // Content Column
+                                                            EventCard(event: event)
+                                                                .padding(.bottom, themeManager.timelineDensity == .compact ? 8 : 20)
+                                                                .padding(.leading, 8)
+                                                        }
+                                                        .padding(.horizontal)
+                                                    }
+                                                    .buttonStyle(PlainButtonStyle())
+                                                }
                                             }
                                         }
-                                        
-                                        // Content Column
-                                        EventCard(event: event)
-                                            .padding(.bottom, themeManager.timelineDensity == .compact ? 8 : 20)
-                                            .padding(.leading, 8)
-                                            .contentShape(Rectangle())
-                                            .onTapGesture {
-                                                selectedEvent = event
-                                            }
-                                            .contextMenu {
-                                                Button(role: .destructive) {
-                                                    deleteEvent(event)
-                                                } label: {
-                                                    Label("Delete", systemImage: "trash")
-                                                }
-                                                
-                                                Button {
-                                                    selectedEvent = event
-                                                } label: {
-                                                    Label("Edit", systemImage: "pencil")
-                                                }
-                                            }
                                     }
-                                    .padding(.horizontal)
                                 }
                             }
                             .padding(.top)
@@ -119,9 +149,6 @@ struct TimelineView: View {
         }
         .sheet(isPresented: $showingSetupWizard) {
             SetupWizardView()
-        }
-        .sheet(item: $selectedEvent) { event in
-            AddEventView(eventToEdit: event)
         }
     }
     

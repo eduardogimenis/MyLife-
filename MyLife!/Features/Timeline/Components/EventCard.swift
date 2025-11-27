@@ -35,6 +35,8 @@ struct EventCard: View {
                     ZStack(alignment: .bottomTrailing) {
                         AsyncPhotoView(photoID: photoID)
                             .frame(height: 120)
+                            .frame(maxWidth: .infinity)
+                            .clipped()
                             .cornerRadius(8)
                         
                         if event.photoIDs.count > 1 {

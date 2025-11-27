@@ -123,13 +123,47 @@ class ThemeManager: ObservableObject {
         didSet { UserDefaults.standard.set(customBackgroundA, forKey: "appCustomBackgroundA") }
     }
     
-    var isBackgroundBlurred: Bool {
-        get { UserDefaults.standard.bool(forKey: "appIsBackgroundBlurred") }
+    var backgroundBlurRadius: Double {
+        get { UserDefaults.standard.double(forKey: "appBackgroundBlurRadius") }
         set {
             objectWillChange.send()
-            UserDefaults.standard.set(newValue, forKey: "appIsBackgroundBlurred")
+            UserDefaults.standard.set(newValue, forKey: "appBackgroundBlurRadius")
         }
     }
+    
+    var backgroundTintOpacity: Double {
+        get { UserDefaults.standard.object(forKey: "appBackgroundTintOpacity") as? Double ?? 0.3 }
+        set {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue, forKey: "appBackgroundTintOpacity")
+        }
+    }
+    
+    var backgroundTintR: Double {
+        get { UserDefaults.standard.double(forKey: "appBackgroundTintR") }
+        set {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue, forKey: "appBackgroundTintR")
+        }
+    }
+    
+    var backgroundTintG: Double {
+        get { UserDefaults.standard.double(forKey: "appBackgroundTintG") }
+        set {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue, forKey: "appBackgroundTintG")
+        }
+    }
+    
+    var backgroundTintB: Double {
+        get { UserDefaults.standard.double(forKey: "appBackgroundTintB") }
+        set {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue, forKey: "appBackgroundTintB")
+        }
+    }
+    
+
     
     var timelineDensityRaw: String {
         get { UserDefaults.standard.string(forKey: "appTimelineDensity") ?? TimelineDensity.comfortable.rawValue }
@@ -182,8 +216,8 @@ class ThemeManager: ObservableObject {
                             .clipped()
                     }
                     .ignoresSafeArea()
-                    .blur(radius: isBackgroundBlurred ? 20 : 0)
-                    .overlay(Color.black.opacity(0.3).ignoresSafeArea())
+                    .blur(radius: backgroundBlurRadius)
+                    .overlay(backgroundTintColor.opacity(backgroundTintOpacity).ignoresSafeArea())
                 } else {
                     Color.theme.background
                 }
@@ -211,6 +245,24 @@ class ThemeManager: ObservableObject {
     }
     
     // MARK: - Computed Properties
+    
+    var backgroundTintColor: Color {
+        Color(red: backgroundTintR, green: backgroundTintG, blue: backgroundTintB)
+    }
+    
+    func setBackgroundTintColor(_ color: Color) {
+        let uic = UIColor(color)
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        
+        if uic.getRed(&r, green: &g, blue: &b, alpha: &a) {
+            backgroundTintR = Double(r)
+            backgroundTintG = Double(g)
+            backgroundTintB = Double(b)
+        }
+    }
     
     var accentColor: Color {
         AppAccentColor(rawValue: accentColorRaw)?.color ?? .blue

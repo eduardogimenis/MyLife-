@@ -172,7 +172,7 @@ struct MainTabView: View {
                 .transition(.scale.combined(with: .opacity))
             }
         }
-        .onChange(of: tourManager.navigateToSettings) { newValue in
+        .onChange(of: tourManager.navigateToSettings) { _, newValue in
             if newValue {
                 selectedTab = 3
             }

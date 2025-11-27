@@ -27,9 +27,11 @@ struct SettingsView: View {
                                 .foregroundColor(themeManager.contrastingTextColor)
                         }
                         
-                        Toggle("Show Event Thumbnails", isOn: $showThumbnails)
-                            .tint(Color.theme.accent)
-                            .foregroundColor(themeManager.contrastingTextColor)
+                        Toggle(isOn: $showThumbnails) {
+                            Label("Show Event Thumbnails", systemImage: "photo")
+                                .foregroundColor(themeManager.contrastingTextColor)
+                        }
+                        .tint(Color.theme.accent)
                     }
                     .listRowBackground(Color.clear)
                     
@@ -75,7 +77,7 @@ struct SettingsView: View {
                         .listRowBackground(tourManager.currentStep == .settingsHighlightPeople ? Color.theme.accent.opacity(0.1) : Color.clear)
                         
                         NavigationLink(value: SettingsDestination.data) {
-                            Text("Import / Export JSON")
+                            Label("Import / Export JSON", systemImage: "arrow.up.arrow.down")
                                 .foregroundColor(themeManager.contrastingTextColor)
                         }
                     }
@@ -83,7 +85,7 @@ struct SettingsView: View {
                     
                     Section(header: Text("About").foregroundColor(themeManager.contrastingTextColor)) {
                         HStack {
-                            Text("Version")
+                            Label("Version", systemImage: "info.circle")
                                 .foregroundColor(themeManager.contrastingTextColor)
                             Spacer()
                             Text("1.0.0")

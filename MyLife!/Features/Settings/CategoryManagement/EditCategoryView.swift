@@ -12,9 +12,29 @@ struct EditCategoryView: View {
     var categoryToEdit: Category?
     
     private let availableIcons = [
+        // Basics
         "briefcase.fill", "graduationcap.fill", "house.fill", "airplane", "star.fill", "heart.fill",
         "person.fill", "cart.fill", "gamecontroller.fill", "tv.fill", "music.note", "book.fill",
-        "sportscourt.fill", "car.fill", "leaf.fill", "flame.fill", "bolt.fill", "cross.case.fill"
+        "sportscourt.fill", "car.fill", "leaf.fill", "flame.fill", "bolt.fill", "cross.case.fill",
+        
+        // Pets & Animals
+        "pawprint.fill", "cat.fill", "dog.fill", "fish.fill", "bird.fill", "tortoise.fill", 
+        "hare.fill", "ant.fill", "ladybug.fill",
+        
+        // Nature & Weather
+        "tree.fill", "camera.macro", "drop.fill", "sun.max.fill", "moon.fill", "cloud.rain.fill",
+        "snowflake", "mountain.2.fill",
+        
+        // Activities & Hobbies
+        "figure.run", "figure.walk", "bicycle", "sailboat.fill", "theatermasks.fill", 
+        "paintpalette.fill", "camera.fill", "hammer.fill",
+        
+        // Food & Drink
+        "fork.knife", "cup.and.saucer.fill", "wineglass.fill", "birthday.cake.fill",
+        
+        // Objects & Celebration
+        "gift.fill", "balloon.fill", "party.popper.fill", "lightbulb.fill", "bell.fill", 
+        "tag.fill", "creditcard.fill", "bag.fill"
     ]
     
     var body: some View {
