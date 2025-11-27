@@ -2,6 +2,7 @@ import SwiftUI
 
 struct EventCard: View {
     let event: LifeEvent
+    var showImage: Bool = true
     @EnvironmentObject var themeManager: ThemeManager
     @AppStorage("showThumbnails") private var showThumbnails = true
     
@@ -30,11 +31,24 @@ struct EventCard: View {
                 }
                 
                 // Photo Thumbnail
-                if showThumbnails, let photoID = event.photoID {
-                    AsyncPhotoView(photoID: photoID)
-                        .frame(height: 120)
-                        .cornerRadius(8)
-                        .padding(.top, 4)
+                if showImage && showThumbnails, let photoID = event.photoIDs.first ?? event.photoID {
+                    ZStack(alignment: .bottomTrailing) {
+                        AsyncPhotoView(photoID: photoID)
+                            .frame(height: 120)
+                            .cornerRadius(8)
+                        
+                        if event.photoIDs.count > 1 {
+                            Text("+\(event.photoIDs.count - 1)")
+                                .font(.caption2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                                .padding(6)
+                                .background(Color.black.opacity(0.6))
+                                .clipShape(Circle())
+                                .padding(8)
+                        }
+                    }
+                    .padding(.top, 4)
                 }
             }
             Spacer()

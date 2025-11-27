@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PeopleFilterView: View {
     let people: [Person]
+    let counts: [Person: Int]
     @Binding var selectedPerson: Person?
     
     var body: some View {
@@ -22,6 +23,7 @@ struct PeopleFilterView: View {
                 ForEach(people) { person in
                     PersonFilterChip(
                         person: person,
+                        count: counts[person],
                         isSelected: selectedPerson == person
                     ) {
                         withAnimation {
@@ -42,6 +44,7 @@ struct PeopleFilterView: View {
 
 struct PersonFilterChip: View {
     let person: Person
+    var count: Int? = nil
     let isSelected: Bool
     let action: () -> Void
     
@@ -50,6 +53,11 @@ struct PersonFilterChip: View {
             HStack(spacing: 4) {
                 Text(person.emoji)
                 Text(person.name)
+                if let count = count {
+                    Text("\(count)")
+                        .font(.system(size: 10, weight: .bold))
+                        .opacity(0.8)
+                }
             }
             .font(.caption)
             .fontWeight(.medium)
@@ -75,6 +83,6 @@ struct PersonFilterChip: View {
 }
 
 #Preview {
-    PeopleFilterView(people: [], selectedPerson: .constant(nil))
+    PeopleFilterView(people: [], counts: [:], selectedPerson: .constant(nil))
         .background(Color.black)
 }

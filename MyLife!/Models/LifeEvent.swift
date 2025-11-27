@@ -12,6 +12,7 @@ final class LifeEvent {
     var notes: String?
     var locationName: String?
     var photoID: String?
+    var photoIDs: [String] = []
     var externalLink: URL?
     
     @Relationship var categoryModel: Category?
@@ -22,7 +23,7 @@ final class LifeEvent {
         set { categoryRawValue = newValue.rawValue }
     }
     
-    init(title: String, date: Date, endDate: Date? = nil, isApproximate: Bool = false, category: EventCategory = .event, notes: String? = nil, locationName: String? = nil, photoID: String? = nil, externalLink: URL? = nil, categoryModel: Category? = nil, people: [Person]? = nil) {
+    init(title: String, date: Date, endDate: Date? = nil, isApproximate: Bool = false, category: EventCategory = .event, notes: String? = nil, locationName: String? = nil, photoID: String? = nil, photoIDs: [String]? = nil, externalLink: URL? = nil, categoryModel: Category? = nil, people: [Person]? = nil) {
         self.title = title
         self.date = date
         self.endDate = endDate
@@ -31,6 +32,7 @@ final class LifeEvent {
         self.notes = notes
         self.locationName = locationName
         self.photoID = photoID
+        self.photoIDs = photoIDs ?? (photoID != nil ? [photoID!] : [])
         self.externalLink = externalLink
         self.categoryModel = categoryModel
         self.people = people

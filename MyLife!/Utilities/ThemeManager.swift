@@ -164,12 +164,14 @@ class ThemeManager: ObservableObject {
             switch backgroundStyle {
             case .solid:
                 customBackgroundColor
+                SmudgeBackgroundView(color: accentColor, opacity: 0.2)
             case .gradient:
                 LinearGradient(
                     colors: [customBackgroundColor, accentColor.opacity(0.2)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
+                SmudgeBackgroundView(color: .white, opacity: 0.15)
             case .image:
                 if let image = backgroundImage {
                     GeometryReader { proxy in
@@ -189,6 +191,8 @@ class ThemeManager: ObservableObject {
         }
         .ignoresSafeArea()
     }
+    
+
     
     // MARK: - Initialization
     
@@ -319,5 +323,33 @@ class ThemeManager: ObservableObject {
     
     private func getDocumentsDirectory() -> URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    }
+}
+
+struct SmudgeBackgroundView: View {
+    var color: Color
+    var opacity: Double
+    
+    var body: some View {
+        GeometryReader { proxy in
+            ZStack {
+                // Top Left Smudge
+                Circle()
+                    .fill(color)
+                    .frame(width: proxy.size.width * 0.9, height: proxy.size.width * 0.9)
+                    .blur(radius: 80)
+                    .offset(x: -proxy.size.width * 0.3, y: -proxy.size.height * 0.2)
+                    .opacity(opacity)
+                
+                // Bottom Right Smudge
+                Circle()
+                    .fill(color)
+                    .frame(width: proxy.size.width * 0.9, height: proxy.size.width * 0.9)
+                    .blur(radius: 80)
+                    .offset(x: proxy.size.width * 0.3, y: proxy.size.height * 0.2)
+                    .opacity(opacity)
+            }
+        }
+        .allowsHitTesting(false)
     }
 }

@@ -27,6 +27,28 @@ struct SearchView: View {
         }
     }
     
+    var categoryCounts: [Category: Int] {
+        var counts: [Category: Int] = [:]
+        for event in events {
+            if let category = event.categoryModel {
+                counts[category, default: 0] += 1
+            }
+        }
+        return counts
+    }
+    
+    var personCounts: [Person: Int] {
+        var counts: [Person: Int] = [:]
+        for event in events {
+            if let people = event.people {
+                for person in people {
+                    counts[person, default: 0] += 1
+                }
+            }
+        }
+        return counts
+    }
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -35,11 +57,20 @@ struct SearchView: View {
                 VStack(spacing: 0) {
                     // Filters
                     VStack(spacing: 0) {
-                        CategoryFilterView(categories: categories, selectedCategory: $selectedCategory)
+                        CategoryFilterView(categories: categories, counts: categoryCounts, selectedCategory: $selectedCategory)
                         
                         if !allPeople.isEmpty {
-                            PeopleFilterView(people: allPeople, selectedPerson: $selectedPerson)
+                            PeopleFilterView(people: allPeople, counts: personCounts, selectedPerson: $selectedPerson)
                         }
+                        
+                        HStack {
+                            Text("\(filteredEvents.count) events found")
+                                .font(.caption)
+                                .foregroundColor(themeManager.contrastingTextColor.opacity(0.6))
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
                     }
                     .padding(.bottom, 8)
                     
@@ -50,7 +81,7 @@ struct SearchView: View {
                             LazyVStack(spacing: 16) {
                                 ForEach(filteredEvents) { event in
                                     NavigationLink(destination: EventDetailView(event: event)) {
-                                        EventCard(event: event)
+                                        EventCard(event: event, showImage: false)
                                     }
                                     .buttonStyle(PlainButtonStyle())
                                 }
