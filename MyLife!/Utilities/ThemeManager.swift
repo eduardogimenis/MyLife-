@@ -126,13 +126,16 @@ class ThemeManager: ObservableObject {
                 )
             case .image:
                 if let image = backgroundImage {
-                    Image(uiImage: image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                        .clipped()
-                        .blur(radius: isBackgroundBlurred ? 20 : 0)
-                        .overlay(Color.black.opacity(0.3))
+                    GeometryReader { proxy in
+                        Image(uiImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: proxy.size.width, height: proxy.size.height)
+                            .clipped()
+                    }
+                    .ignoresSafeArea()
+                    .blur(radius: isBackgroundBlurred ? 20 : 0)
+                    .overlay(Color.black.opacity(0.3).ignoresSafeArea())
                 } else {
                     Color.theme.background
                 }

@@ -13,119 +13,115 @@ struct TimelineView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background handled locally to ensure visibility
-                themeManager.backgroundView() 
+                themeManager.backgroundView()
                 
-                if events.isEmpty {
-                    VStack(spacing: 20) {
-                        Image(systemName: "sparkles")
-                            .font(.system(size: 60))
-                            .foregroundColor(themeManager.accentColor)
-                            .padding(.bottom, 10)
-                        
-                        Text("Welcome to your Timeline")
-                            .font(.system(.title2, design: themeManager.fontDesign))
-                            .fontWeight(.bold)
-                            .foregroundColor(themeManager.contrastingTextColor)
-                        
-                        Text("It looks a bit empty. Let's add your major milestones.")
-                            .font(.system(.body, design: themeManager.fontDesign))
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(themeManager.contrastingTextColor.opacity(0.8))
-                            .padding(.horizontal)
-                        
-                        Button("Start Setup") {
-                            showingSetupWizard = true
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(themeManager.accentColor)
-                        .padding(.top, 10)
-                        
-                        Button("Load Mock Data") {
-                            loadMockData()
-                        }
-                        .font(.caption)
-                        .foregroundColor(themeManager.contrastingTextColor.opacity(0.6))
-                        .padding(.top, 20)
-                    }
-                    .toolbar {
-                        ToolbarItem(placement: .topBarLeading) {
-                            Button(action: { showingAddEvent = true }) {
-                                Image(systemName: "plus")
-                            }
-                        }
-                    }
-                } else {
-                    ScrollView {
-                        LazyVStack(spacing: themeManager.timelineDensity == .compact ? 0 : 16) {
-                            ForEach(events) { event in
-                                HStack(alignment: .top, spacing: 0) {
-                                    // Time Column (Year)
-                                    // Ideally we group by year, but for MVP simple list first
-                                    
-                                    // Node Column
-                                    VStack(spacing: 0) {
-                                        TimelineNode(isApproximate: event.isApproximate, category: event.categoryModel, fallbackCategory: event.category)
-                                        
-                                        // Connector Line
-                                        if event != events.last {
-                                            Rectangle()
-                                                .fill(Color.gray.opacity(0.3))
-                                                .frame(width: 2)
-                                                .frame(minHeight: themeManager.timelineDensity == .compact ? 20 : 40)
-                                        }
-                                    }
-                                    
-                                    // Content Column
-                                    EventCard(event: event)
-                                        .padding(.bottom, themeManager.timelineDensity == .compact ? 8 : 20)
-                                        .padding(.leading, 8)
-                                        .contentShape(Rectangle()) // Make entire card area tappable
-                                        .onTapGesture {
-                                            selectedEvent = event
-                                        }
-                                        .contextMenu {
-                                            Button(role: .destructive) {
-                                                deleteEvent(event)
-                                            } label: {
-                                                Label("Delete", systemImage: "trash")
-                                            }
-                                            
-                                            Button {
-                                                selectedEvent = event
-                                            } label: {
-                                                Label("Edit", systemImage: "pencil")
-                                            }
-                                        }
-                                }
+                VStack(spacing: 0) {
+                    if events.isEmpty {
+                        VStack(spacing: 20) {
+                            Image(systemName: "sparkles")
+                                .font(.system(size: 60))
+                                .foregroundColor(themeManager.accentColor)
+                                .padding(.bottom, 10)
+                            
+                            Text("Welcome to your Timeline")
+                                .font(.system(.title2, design: themeManager.fontDesign))
+                                .fontWeight(.bold)
+                                .foregroundColor(themeManager.contrastingTextColor)
+                            
+                            Text("It looks a bit empty. Let's add your major milestones.")
+                                .font(.system(.body, design: themeManager.fontDesign))
+                                .multilineTextAlignment(.center)
+                                .foregroundColor(themeManager.contrastingTextColor.opacity(0.8))
                                 .padding(.horizontal)
+                            
+                            Button("Start Setup") {
+                                showingSetupWizard = true
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(themeManager.accentColor)
+                            .padding(.top, 10)
+                            
+                            Button("Load Mock Data") {
+                                loadMockData()
+                            }
+                            .font(.caption)
+                            .foregroundColor(themeManager.contrastingTextColor.opacity(0.6))
+                            .padding(.top, 20)
+                        }
+                        .toolbar {
+                            ToolbarItem(placement: .topBarLeading) {
+                                Button(action: { showingAddEvent = true }) {
+                                    Image(systemName: "plus")
+                                }
                             }
                         }
-                        .padding(.top)
-                    }
-                    .scrollContentBackground(.hidden) // Ensure ScrollView is transparent
-                    .navigationTitle("MyLife!")
-                    .toolbarColorScheme(themeManager.contrastingTextColor == .white ? .dark : .light, for: .navigationBar)
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button(action: { showingAddEvent = true }) {
-                                Image(systemName: "plus")
+                    } else {
+                        ScrollView {
+                            LazyVStack(spacing: themeManager.timelineDensity == .compact ? 0 : 16) {
+                                ForEach(events) { event in
+                                    HStack(alignment: .top, spacing: 0) {
+                                        // Node Column
+                                        VStack(spacing: 0) {
+                                            TimelineNode(isApproximate: event.isApproximate, category: event.categoryModel, fallbackCategory: event.category)
+                                            
+                                            // Connector Line
+                                            if event != events.last {
+                                                Rectangle()
+                                                    .fill(Color.gray.opacity(0.3))
+                                                    .frame(width: 2)
+                                                    .frame(minHeight: themeManager.timelineDensity == .compact ? 20 : 40)
+                                            }
+                                        }
+                                        
+                                        // Content Column
+                                        EventCard(event: event)
+                                            .padding(.bottom, themeManager.timelineDensity == .compact ? 8 : 20)
+                                            .padding(.leading, 8)
+                                            .contentShape(Rectangle())
+                                            .onTapGesture {
+                                                selectedEvent = event
+                                            }
+                                            .contextMenu {
+                                                Button(role: .destructive) {
+                                                    deleteEvent(event)
+                                                } label: {
+                                                    Label("Delete", systemImage: "trash")
+                                                }
+                                                
+                                                Button {
+                                                    selectedEvent = event
+                                                } label: {
+                                                    Label("Edit", systemImage: "pencil")
+                                                }
+                                            }
+                                    }
+                                    .padding(.horizontal)
+                                }
+                            }
+                            .padding(.top)
+                        }
+                        .scrollContentBackground(.hidden)
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                Button(action: { showingAddEvent = true }) {
+                                    Image(systemName: "plus")
+                                }
                             }
                         }
                     }
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.clear)
-            .sheet(isPresented: $showingAddEvent) {
-                AddEventView()
-            }
-            .sheet(isPresented: $showingSetupWizard) {
-                SetupWizardView()
-            }
-            .sheet(item: $selectedEvent) { event in
-                AddEventView(eventToEdit: event)
-            }
+            .navigationTitle(events.isEmpty ? "" : "MyLife!")
+            .toolbarColorScheme(themeManager.contrastingTextColor == .black ? .light : .dark, for: .navigationBar)
+        }
+        .sheet(isPresented: $showingAddEvent) {
+            AddEventView()
+        }
+        .sheet(isPresented: $showingSetupWizard) {
+            SetupWizardView()
+        }
+        .sheet(item: $selectedEvent) { event in
+            AddEventView(eventToEdit: event)
         }
     }
     

@@ -65,7 +65,6 @@ struct SearchView: View {
             .toolbarColorScheme(themeManager.contrastingTextColor == .white ? .dark : .light, for: .navigationBar)
             .searchable(text: $searchText, prompt: "Search memories, notes, places...")
         }
-        .background(Color.clear)
     }
 }
 

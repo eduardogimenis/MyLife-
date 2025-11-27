@@ -58,7 +58,6 @@ struct SettingsView: View {
             .navigationTitle("Settings")
             .toolbarColorScheme(themeManager.contrastingTextColor == .white ? .dark : .light, for: .navigationBar)
         }
-        .background(Color.clear)
     }
 }
 

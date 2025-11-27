@@ -30,68 +30,70 @@ struct GalleryView: View {
     }
     
     var body: some View {
-        ZStack {
-            themeManager.backgroundView()
-            
-            VStack(spacing: 0) {
-                // Filters
-                VStack(spacing: 0) {
-                    CategoryFilterView(categories: categories, selectedCategory: $selectedCategory)
-                    
-                    if !allPeople.isEmpty {
-                        PeopleFilterView(people: allPeople, selectedPerson: $selectedPerson)
-                    }
-                }
-                .padding(.bottom, 8)
+        NavigationStack {
+            ZStack {
+                themeManager.backgroundView()
                 
-                ScrollView {
-                    LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(groupedEvents, id: \.0) { year, events in
-                            Section(header: 
-                                HStack {
-                                    Text(String(year))
-                                        .font(.title2)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(themeManager.contrastingTextColor)
-                                        .padding(.vertical, 8)
-                                    Spacer()
-                                }
-                            ) {
-                                ForEach(events) { event in
-                                    if let photoID = event.photoID {
-                                        NavigationLink(destination: EventDetailView(event: event)) {
-                                            VStack(alignment: .leading) {
-                                                AsyncPhotoView(photoID: photoID)
-                                                    .frame(minWidth: 0, maxWidth: .infinity)
-                                                    .frame(height: 150)
-                                                    .clipped()
-                                                    .cornerRadius(12)
-                                                
-                                                Text(event.title)
-                                                    .font(.caption)
-                                                    .fontWeight(.bold)
-                                                    .lineLimit(1)
-                                                    .foregroundColor(themeManager.contrastingTextColor)
-                                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                                
-                                                Text(event.date.formatted(date: .abbreviated, time: .omitted))
-                                                    .font(.caption2)
-                                                    .foregroundColor(themeManager.contrastingTextColor.opacity(0.7))
-                                                    .frame(maxWidth: .infinity, alignment: .leading)
+                VStack(spacing: 0) {
+                    // Filters
+                    VStack(spacing: 0) {
+                        CategoryFilterView(categories: categories, selectedCategory: $selectedCategory)
+                        
+                        if !allPeople.isEmpty {
+                            PeopleFilterView(people: allPeople, selectedPerson: $selectedPerson)
+                        }
+                    }
+                    .padding(.bottom, 8)
+                    
+                    ScrollView {
+                        LazyVGrid(columns: columns, spacing: 16) {
+                            ForEach(groupedEvents, id: \.0) { year, events in
+                                Section(header: 
+                                    HStack {
+                                        Text(String(year))
+                                            .font(.title2)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(themeManager.contrastingTextColor)
+                                            .padding(.vertical, 8)
+                                        Spacer()
+                                    }
+                                ) {
+                                    ForEach(events) { event in
+                                        if let photoID = event.photoID {
+                                            NavigationLink(destination: EventDetailView(event: event)) {
+                                                VStack(alignment: .leading) {
+                                                    AsyncPhotoView(photoID: photoID)
+                                                        .frame(minWidth: 0, maxWidth: .infinity)
+                                                        .frame(height: 150)
+                                                        .clipped()
+                                                        .cornerRadius(12)
+                                                    
+                                                    Text(event.title)
+                                                        .font(.caption)
+                                                        .fontWeight(.bold)
+                                                        .lineLimit(1)
+                                                        .foregroundColor(themeManager.contrastingTextColor)
+                                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                                    
+                                                    Text(event.date.formatted(date: .abbreviated, time: .omitted))
+                                                        .font(.caption2)
+                                                        .foregroundColor(themeManager.contrastingTextColor.opacity(0.7))
+                                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         }
+                        .padding()
                     }
-                    .padding()
+                    .scrollContentBackground(.hidden)
                 }
-                .scrollContentBackground(.hidden)
             }
+            .navigationTitle("Gallery")
+            .toolbarColorScheme(themeManager.contrastingTextColor == .white ? .dark : .light, for: .navigationBar)
         }
-        .navigationTitle("Gallery")
-        .toolbarColorScheme(themeManager.contrastingTextColor == .white ? .dark : .light, for: .navigationBar)
     }
 }
 

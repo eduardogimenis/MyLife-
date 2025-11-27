@@ -7,6 +7,7 @@ struct ContentView: View {
     var body: some View {
         MainTabView()
             .preferredColorScheme(themeManager.contrastingTextColor == .black ? .light : .dark)
+            .fontDesign(themeManager.fontDesign)
             .onAppear {
                 MigrationManager.shared.performMigration(modelContext: modelContext)
             }
