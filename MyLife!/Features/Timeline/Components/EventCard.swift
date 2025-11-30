@@ -13,21 +13,22 @@ struct EventCard: View {
                     .font(.headline)
                     .fontWeight(.semibold)
                     .foregroundColor(themeManager.contrastingTextColor)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .frame(height: 22, alignment: .leading)
                 
-                if let location = event.locationName {
-                    Text(location)
-                        .font(.captionText)
-                        .foregroundColor(themeManager.contrastingTextColor.opacity(0.6))
-                }
+                // Location removed to optimize space in timeline list
                 
                 if let endDate = event.endDate {
                     Text("\(event.date.formatted(date: .abbreviated, time: .omitted)) - \(endDate.formatted(date: .abbreviated, time: .omitted))")
                         .font(.caption2)
                         .foregroundColor(Color.theme.accent)
+                        .lineLimit(1)
                 } else {
                     Text(event.date.formatted(date: .abbreviated, time: .omitted))
                         .font(.caption2)
                         .foregroundColor(Color.theme.accent)
+                        .lineLimit(1)
                 }
                 
                 // Photo Thumbnail
@@ -53,34 +54,21 @@ struct EventCard: View {
                     .padding(.top, 4)
                 }
             }
+            .frame(height: 45, alignment: .topLeading)
             Spacer()
             
-            // Category Icon & People
+            // Category Icon
             VStack(alignment: .trailing, spacing: 4) {
                 if let category = event.categoryModel {
                     Image(systemName: category.iconName)
                         .foregroundColor(category.color.opacity(0.7))
                         .font(.caption)
+                        .frame(width: 24, height: 24)
                 } else {
                     Image(systemName: event.category.rawValue == "Event" ? "star.fill" : "circle.fill") // Fallback
                          .foregroundColor(event.category.color.opacity(0.7))
                          .font(.caption)
-                }
-                
-                if let people = event.people, !people.isEmpty {
-                    HStack(spacing: -4) {
-                        ForEach(people.prefix(3)) { person in
-                            Text(person.emoji)
-                                .font(.caption2)
-                                .padding(2)
-                                .background(Circle().fill(Color.theme.cardBackground))
-                        }
-                        if people.count > 3 {
-                            Text("+\(people.count - 3)")
-                                .font(.caption2)
-                                .foregroundColor(.gray)
-                        }
-                    }
+                         .frame(width: 24, height: 24)
                 }
             }
         }

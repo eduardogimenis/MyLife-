@@ -280,26 +280,21 @@ class ThemeManager: ObservableObject {
     }
 
     var contrastingTextColor: Color {
-        switch backgroundStyle {
-        case .solid, .gradient:
-            // Calculate luminance of customBackgroundColor
-            let uic = UIColor(customBackgroundColor)
-            var r: CGFloat = 0
-            var g: CGFloat = 0
-            var b: CGFloat = 0
-            var a: CGFloat = 0
-            
-            // Try to get components, defaulting to dark (white text) if fails
-            guard uic.getRed(&r, green: &g, blue: &b, alpha: &a) else { return .white }
-            
-            // Luminance formula
-            let luminance = 0.299 * r + 0.587 * g + 0.114 * b
-            
-            return luminance > 0.6 ? .black : .white
-        case .image:
-            // Images have a dark overlay, so white text usually pops better
-            return .white
-        }
+        // Calculate luminance of customBackgroundColor
+        let uic = UIColor(customBackgroundColor)
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        
+        // Try to get components, defaulting to dark (white text) if fails
+        guard uic.getRed(&r, green: &g, blue: &b, alpha: &a) else { return .white }
+        
+        // Luminance formula
+        let luminance = 0.299 * r + 0.587 * g + 0.114 * b
+        
+        // Use black text for light backgrounds, white for dark
+        return luminance > 0.6 ? .black : .white
     }
     
     func setCustomBackgroundColor(_ color: Color) {
@@ -373,6 +368,54 @@ class ThemeManager: ObservableObject {
         self.backgroundImage = nil
     }
     
+    // MARK: - Theme Presets
+    
+    struct ThemePreset: Identifiable {
+        let id = UUID()
+        let name: String
+        let icon: String
+        let imageName: String
+        let accentColor: AppAccentColor
+        let backgroundStyle: BackgroundStyle
+        let customColor: Color
+        let fontDesign: FontDesign
+        
+        static let allPresets: [ThemePreset] = [
+            ThemePreset(name: "Default", icon: "iphone", imageName: "", accentColor: .blue, backgroundStyle: .solid, customColor: .black, fontDesign: .default),
+            ThemePreset(name: "Forest", icon: "tree.fill", imageName: "theme_forest", accentColor: .green, backgroundStyle: .image, customColor: Color(red: 0.1, green: 0.3, blue: 0.1), fontDesign: .rounded),
+            ThemePreset(name: "Floral", icon: "leaf.fill", imageName: "theme_floral", accentColor: .pink, backgroundStyle: .image, customColor: Color(red: 1.0, green: 0.9, blue: 0.95), fontDesign: .serif),
+            ThemePreset(name: "Urban", icon: "building.2.fill", imageName: "theme_urban", accentColor: .teal, backgroundStyle: .image, customColor: Color(red: 0.2, green: 0.2, blue: 0.25), fontDesign: .monospaced),
+            ThemePreset(name: "Travel", icon: "airplane", imageName: "theme_travel", accentColor: .blue, backgroundStyle: .image, customColor: Color(red: 0.85, green: 0.95, blue: 1.0), fontDesign: .default),
+            ThemePreset(name: "Car", icon: "car.fill", imageName: "theme_car", accentColor: .orange, backgroundStyle: .image, customColor: Color(red: 0.1, green: 0.1, blue: 0.1), fontDesign: .default),
+            ThemePreset(name: "Art", icon: "paintpalette.fill", imageName: "theme_art", accentColor: .purple, backgroundStyle: .image, customColor: Color(red: 0.2, green: 0.1, blue: 0.3), fontDesign: .serif),
+            ThemePreset(name: "Family", icon: "figure.2.and.child.holdinghands", imageName: "theme_family", accentColor: .orange, backgroundStyle: .image, customColor: Color(red: 1.0, green: 0.95, blue: 0.8), fontDesign: .rounded)
+        ]
+    }
+    
+    func apply(preset: ThemePreset) {
+        self.accentColorRaw = preset.accentColor.rawValue
+        self.backgroundStyleRaw = preset.backgroundStyle.rawValue
+        self.fontDesignRaw = preset.fontDesign.rawValue
+        
+        // Apply custom color (fallback or tint)
+        self.setCustomBackgroundColor(preset.customColor)
+        
+        // Load and save preset image
+        if let image = UIImage(named: preset.imageName) {
+            self.saveBackgroundImage(image)
+            // Set tint to match theme but keep it subtle
+            self.backgroundTintR = Double(UIColor(preset.customColor).cgColor.components?[0] ?? 0)
+            self.backgroundTintG = Double(UIColor(preset.customColor).cgColor.components?[1] ?? 0)
+            self.backgroundTintB = Double(UIColor(preset.customColor).cgColor.components?[2] ?? 0)
+            self.backgroundTintOpacity = 0.3
+            self.backgroundBlurRadius = 0
+        } else {
+            // Fallback if image missing
+            self.backgroundImage = nil
+            self.deleteBackgroundImage()
+        }
+    }
+
     private func getDocumentsDirectory() -> URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }

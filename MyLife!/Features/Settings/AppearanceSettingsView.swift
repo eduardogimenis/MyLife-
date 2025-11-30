@@ -10,6 +10,14 @@ struct AppearanceSettingsView: View {
             themeManager.backgroundView()
             
             Form {
+                Section(header: Text("Theme Gallery").foregroundColor(themeManager.contrastingTextColor)) {
+                    NavigationLink(destination: ThemeSelectionView()) {
+                        Label("Browse Themes", systemImage: "paintpalette.fill")
+                            .foregroundColor(themeManager.contrastingTextColor)
+                    }
+                }
+                .listRowBackground(Color.clear)
+                
                 Section(header: Text("Accent Color")) {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 15) {
@@ -126,16 +134,6 @@ struct AppearanceSettingsView: View {
                         }
                     }
                     .padding(.vertical, 4)
-                }
-                .listRowBackground(Color.clear)
-                
-                Section(header: Text("Timeline Density")) {
-                    Picker("Density", selection: $themeManager.timelineDensityRaw) {
-                        ForEach(ThemeManager.TimelineDensity.allCases) { density in
-                            Text(density.rawValue.capitalized).tag(density.rawValue)
-                        }
-                    }
-                    .pickerStyle(.segmented)
                 }
                 .listRowBackground(Color.clear)
                 

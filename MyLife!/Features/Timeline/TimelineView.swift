@@ -35,109 +35,23 @@ struct TimelineView: View {
                 
                 VStack(spacing: 0) {
                     if events.isEmpty {
-                        VStack(spacing: 20) {
-                            Image(systemName: "sparkles")
-                                .font(.system(size: 60))
-                                .foregroundColor(themeManager.accentColor)
-                                .padding(.bottom, 10)
-                            
-                            Text("Welcome to your Timeline")
-                                .font(.system(.title2, design: themeManager.fontDesign))
-                                .fontWeight(.bold)
-                                .foregroundColor(themeManager.contrastingTextColor)
-                            
-                            Text("It looks a bit empty. Let's add your major milestones.")
-                                .font(.system(.body, design: themeManager.fontDesign))
-                                .multilineTextAlignment(.center)
-                                .foregroundColor(themeManager.contrastingTextColor.opacity(0.8))
-                                .padding(.horizontal)
-                            
-                            Button("Start Setup") {
-                                showingSetupWizard = true
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .tint(themeManager.accentColor)
-                            .padding(.top, 10)
-                            
-                            Button("Load Mock Data") {
-                                loadMockData()
-                            }
-                            .font(.caption)
-                            .foregroundColor(themeManager.contrastingTextColor.opacity(0.6))
-                            .padding(.top, 20)
-                        }
-                        .toolbar {
-                            ToolbarItem(placement: .topBarLeading) {
-                                Button(action: { showingAddEvent = true }) {
-                                    Image(systemName: "plus")
-                                }
-                            }
-                        }
-                    } else {
-                        ScrollView {
-                            VStack(spacing: 0) {
-                                ForEach(groupedEvents, id: \.0) { year, months in
-                                    VStack(alignment: .leading, spacing: 0) {
-                                        // Year Header
-                                        Text(String(year))
-                                            .font(.system(.title2, design: .rounded))
-                                            .fontWeight(.bold)
-                                            .foregroundColor(themeManager.contrastingTextColor)
-                                            .padding(.horizontal)
-                                            .padding(.top, 24)
-                                            .padding(.bottom, 8)
-                                        
-                                        ForEach(months, id: \.0) { month, monthEvents in
-                                            VStack(alignment: .leading, spacing: 0) {
-                                                // Month Header
-                                                Text(month)
-                                                    .font(.subheadline)
-                                                    .fontWeight(.medium)
-                                                    .foregroundColor(themeManager.accentColor)
-                                                    .padding(.horizontal)
-                                                    .padding(.top, 8)
-                                                    .padding(.bottom, 12)
-                                                
-                                                ForEach(monthEvents) { event in
-                                                    NavigationLink(destination: EventDetailView(event: event)) {
-                                                        HStack(alignment: .top, spacing: 0) {
-                                                            // Node Column
-                                                            VStack(spacing: 0) {
-                                                                TimelineNode(isApproximate: event.isApproximate, category: event.categoryModel, fallbackCategory: event.category)
-                                                                
-                                                                // Connector Line
-                                                                if event != monthEvents.last || month != months.last?.0 {
-                                                                    Rectangle()
-                                                                        .fill(Color.gray.opacity(0.3))
-                                                                        .frame(width: 2)
-                                                                        .frame(minHeight: themeManager.timelineDensity == .compact ? 20 : 40)
-                                                                }
-                                                            }
-                                                            
-                                                            // Content Column
-                                                            EventCard(event: event)
-                                                                .padding(.bottom, themeManager.timelineDensity == .compact ? 8 : 20)
-                                                                .padding(.leading, 8)
-                                                        }
-                                                        .padding(.horizontal)
-                                                    }
-                                                    .buttonStyle(PlainButtonStyle())
-                                                }
-                                            }
-                                        }
+                        emptyStateView
+                            .toolbar {
+                                ToolbarItem(placement: .topBarLeading) {
+                                    Button(action: { showingAddEvent = true }) {
+                                        Image(systemName: "plus")
                                     }
                                 }
                             }
-                            .padding(.top)
-                        }
-                        .scrollContentBackground(.hidden)
-                        .toolbar {
-                            ToolbarItem(placement: .topBarTrailing) {
-                                Button(action: { showingAddEvent = true }) {
-                                    Image(systemName: "plus")
+                    } else {
+                        timelineContent
+                            .toolbar {
+                                ToolbarItem(placement: .topBarTrailing) {
+                                    Button(action: { showingAddEvent = true }) {
+                                        Image(systemName: "plus")
+                                    }
                                 }
                             }
-                        }
                     }
                 }
             }
@@ -150,6 +64,61 @@ struct TimelineView: View {
         .sheet(isPresented: $showingSetupWizard) {
             SetupWizardView()
         }
+    }
+    
+    private var emptyStateView: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "sparkles")
+                .font(.system(size: 60))
+                .foregroundColor(themeManager.accentColor)
+                .padding(.bottom, 10)
+            
+            Text("Welcome to your Timeline")
+                .font(.system(.title2, design: themeManager.fontDesign))
+                .fontWeight(.bold)
+                .foregroundColor(themeManager.contrastingTextColor)
+            
+            Text("It looks a bit empty. Let's add your major milestones.")
+                .font(.system(.body, design: themeManager.fontDesign))
+                .multilineTextAlignment(.center)
+                .foregroundColor(themeManager.contrastingTextColor.opacity(0.8))
+                .padding(.horizontal)
+            
+            Button("Start Setup") {
+                showingSetupWizard = true
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(themeManager.accentColor)
+            .padding(.top, 10)
+            
+            Button("Load Mock Data") {
+                loadMockData()
+            }
+            .font(.caption)
+            .foregroundColor(themeManager.contrastingTextColor.opacity(0.6))
+            .padding(.top, 20)
+        }
+    }
+    
+    private var timelineContent: some View {
+        ScrollView {
+            LazyVStack(spacing: 0) {
+                ForEach(groupedEvents, id: \.0) { year, months in
+                    VStack(spacing: 0) {
+                        ForEach(months, id: \.0) { monthData in
+                            MonthRowView(
+                                year: year,
+                                month: monthData.0,
+                                events: monthData.1,
+                                isFirstMonth: monthData.0 == months.first?.0
+                            )
+                        }
+                    }
+                }
+            }
+            .padding(.top)
+        }
+        .scrollContentBackground(.hidden)
     }
     
     private func deleteEvent(_ event: LifeEvent) {
@@ -175,6 +144,51 @@ struct TimelineView: View {
             }
             modelContext.insert(event)
         }
+    }
+}
+
+private struct MonthRowView: View {
+    let year: Int
+    let month: String
+    let events: [LifeEvent]
+    let isFirstMonth: Bool
+    @EnvironmentObject var themeManager: ThemeManager
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            // Left Rail: Year & Month
+            VStack(alignment: .trailing, spacing: 2) {
+                // Show Year only for the first month of the year
+                if isFirstMonth {
+                    Text(String(year))
+                        .font(.system(.title3, design: .rounded))
+                        .fontWeight(.heavy)
+                        .foregroundColor(themeManager.contrastingTextColor)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .padding(.bottom, 2)
+                }
+                
+                Text(month.prefix(3).uppercased())
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .foregroundColor(themeManager.contrastingTextColor.opacity(0.6))
+            }
+            .frame(width: 60, alignment: .trailing)
+            .padding(.top, 6)
+            
+            // Right Rail: Events
+            VStack(spacing: 0) {
+                ForEach(events) { event in
+                    NavigationLink(destination: EventDetailView(event: event)) {
+                        EventCard(event: event, showImage: false)
+                            .padding(.bottom, themeManager.timelineDensity == .compact ? 8 : 16)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 8)
     }
 }
 

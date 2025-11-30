@@ -1,7 +1,9 @@
 import SwiftUI
+import SwiftData
 
 struct EventDetailView: View {
     let event: LifeEvent
+    @Environment(\.dismiss) var dismiss
     @EnvironmentObject var themeManager: ThemeManager
     @State private var showingEditSheet = false
     
@@ -99,6 +101,7 @@ struct EventDetailView: View {
                     
                     Spacer()
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .navigationTitle("Event Details")
@@ -112,6 +115,11 @@ struct EventDetailView: View {
         }
         .sheet(isPresented: $showingEditSheet) {
             AddEventView(eventToEdit: event)
+        }
+        .onChange(of: event.isDeleted) { _, isDeleted in
+            if isDeleted {
+                dismiss()
+            }
         }
     }
 }
