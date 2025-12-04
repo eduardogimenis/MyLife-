@@ -14,6 +14,7 @@ struct SettingsView: View {
     @EnvironmentObject var tourManager: TourManager
     @AppStorage("showThumbnails") private var showThumbnails = true
     @State private var navigationPath = NavigationPath()
+    @State private var isFlashing = false
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -36,6 +37,8 @@ struct SettingsView: View {
                         .tint(Color.theme.accent)
                     }
                     .listRowBackground(Color.clear)
+                    .disabled(isRestricted())
+                    .blur(radius: isRestricted() ? 4 : 0)
                     
                     Section(header: Text("Data Management").foregroundColor(themeManager.contrastingTextColor).textContrast()) {
                         NavigationLink(value: SettingsDestination.categories) {
@@ -46,18 +49,13 @@ struct SettingsView: View {
                                 
                                 if tourManager.currentStep == .settingsHighlightCategories {
                                     Spacer()
-                                    Text("Tap Here")
-                                        .font(.caption)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(Color.theme.accent)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 4)
-                                        .background(Color.theme.accent.opacity(0.6))
-                                        .cornerRadius(8)
+                                    TapHereBadge(isFlashing: isFlashing)
                                 }
                             }
                         }
-                        .listRowBackground(tourManager.currentStep == .settingsHighlightCategories ? Color.theme.accent.opacity(0.1) : Color.clear)
+                        .listRowBackground(rowBackground(for: .settingsHighlightCategories))
+                        .disabled(isRestricted(exempt: .settingsHighlightCategories))
+                        .blur(radius: isRestricted(exempt: .settingsHighlightCategories) ? 4 : 0)
                         
                         NavigationLink(value: SettingsDestination.people) {
                             HStack {
@@ -67,24 +65,21 @@ struct SettingsView: View {
                                 
                                 if tourManager.currentStep == .settingsHighlightPeople {
                                     Spacer()
-                                    Text("Tap Here")
-                                        .font(.caption)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(Color.theme.accent)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 4)
-                                        .background(Color.theme.accent.opacity(0.6))
-                                        .cornerRadius(8)
+                                    TapHereBadge(isFlashing: isFlashing)
                                 }
                             }
                         }
-                        .listRowBackground(tourManager.currentStep == .settingsHighlightPeople ? Color.theme.accent.opacity(0.1) : Color.clear)
+                        .listRowBackground(rowBackground(for: .settingsHighlightPeople))
+                        .disabled(isRestricted(exempt: .settingsHighlightPeople))
+                        .blur(radius: isRestricted(exempt: .settingsHighlightPeople) ? 4 : 0)
                         
                         NavigationLink(value: SettingsDestination.data) {
                             Label("Import / Export JSON", systemImage: "arrow.up.arrow.down")
                                 .foregroundColor(themeManager.contrastingTextColor)
                                 .textContrast()
                         }
+                        .disabled(isRestricted())
+                        .blur(radius: isRestricted() ? 4 : 0)
                     }
                     .listRowBackground(Color.clear)
                     
@@ -100,6 +95,8 @@ struct SettingsView: View {
                         }
                     }
                     .listRowBackground(Color.clear)
+                    .disabled(isRestricted())
+                    .blur(radius: isRestricted() ? 4 : 0)
                 }
                 .scrollContentBackground(.hidden)
             }
@@ -117,7 +114,68 @@ struct SettingsView: View {
                     DataManagementView()
                 }
             }
+            .onAppear {
+                if tourManager.currentStep != nil {
+                    // Small delay to ensure animation triggers correctly on first load
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        isFlashing = true
+                    }
+                    tourManager.startInactivityTimer()
+                }
+            }
+            .onDisappear {
+                isFlashing = false
+                tourManager.stopInactivityTimer()
+            }
+            .alert("Stop Tutorial?", isPresented: $tourManager.showSkipPrompt) {
+                Button("Continue Tutorial", role: .cancel) {
+                    tourManager.resetInactivityTimer()
+                }
+                Button("Stop Tutorial", role: .destructive) {
+                    tourManager.endTour()
+                }
+            } message: {
+                Text("Noticed you haven't checked the categories/people yet. Would you like to stop the tutorial?")
+            }
         }
+    }
+    
+    @ViewBuilder
+    func rowBackground(for step: TourStep) -> some View {
+        if tourManager.currentStep == step {
+            Color.theme.accent
+                .opacity(isFlashing ? 0.4 : 0.05)
+                .animation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true), value: isFlashing)
+        } else {
+            Color.clear
+        }
+    }
+    
+    func isRestricted(exempt step: TourStep? = nil) -> Bool {
+        guard let current = tourManager.currentStep else { return false }
+        // Only apply restrictions during the high-level settings highlight steps
+        guard current == .settingsHighlightCategories || current == .settingsHighlightPeople else { return false }
+        return current != step
+    }
+}
+
+struct TapHereBadge: View {
+    var isFlashing: Bool
+    
+    var body: some View {
+        Text("Tap Here")
+            .font(.caption)
+            .fontWeight(.bold)
+            .foregroundColor(Color.theme.accent)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(
+                Color.theme.accent
+                    .opacity(isFlashing ? 1.0 : 0.3)
+                    .animation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true), value: isFlashing)
+                    .cornerRadius(8)
+            )
+            .allowsHitTesting(false)
     }
 }
     

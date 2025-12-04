@@ -52,6 +52,30 @@ struct MainTabView: View {
             .tint(themeManager.accentColor)
             .background(themeManager.backgroundView())
             
+            // Tab Bar Blocker during Settings Tour
+            if tourManager.currentStep != nil {
+                VStack(spacing: 0) {
+                    Spacer()
+                    Rectangle()
+                        .fill(.ultraThinMaterial)
+                        .overlay(Color.black.opacity(0.4))
+                        .frame(height: 200)
+                        .mask(
+                            LinearGradient(
+                                gradient: Gradient(stops: [
+                                    .init(color: .clear, location: 0),
+                                    .init(color: .black, location: 0.4),
+                                    .init(color: .black, location: 1)
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                }
+                .ignoresSafeArea()
+                .allowsHitTesting(true) // Blocks touches to the tab bar
+            }
+            
             // Contextual Tour Overlay
             if !hasSeenOnboarding {
                 Color.black.opacity(0.4)
