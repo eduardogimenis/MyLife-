@@ -11,11 +11,16 @@ struct MyLife_App: App {
             LifeEvent.self,
             Category.self,
             Person.self,
+            DraftEvent.self,
+            ImportedAssetLog.self,
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false, cloudKitDatabase: .none)
+        
+        // USE A NEW STORE NAME TO RESET DB (Fixes migration freeze)
+        let config = ModelConfiguration("MyLife_v2", schema: schema, isStoredInMemoryOnly: false)
 
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            return try ModelContainer(for: schema, configurations: [config])
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }

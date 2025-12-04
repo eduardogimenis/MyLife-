@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import PhotosUI
+import Photos
 
 struct AddEventView: View {
     @Environment(\.modelContext) private var modelContext
@@ -49,6 +50,7 @@ struct AddEventView: View {
                         .tint(Color.theme.accent)
                     
                     Picker("Category", selection: $selectedCategory) {
+                        Text("None").tag(nil as Category?)
                         ForEach(categories) { cat in
                             HStack {
                                 Image(systemName: cat.iconName)
@@ -205,6 +207,24 @@ struct AddEventView: View {
                 }
                 
                 for id in selectedPhotoIDs {
+                    // 1. Try loading from PhotoKit (Imported Asset)
+                    let assets = PHAsset.fetchAssets(withLocalIdentifiers: [id], options: nil)
+                    if let asset = assets.firstObject {
+                        let manager = PHImageManager.default()
+                        let options = PHImageRequestOptions()
+                        options.isSynchronous = false
+                        options.deliveryMode = .highQualityFormat
+                        options.isNetworkAccessAllowed = true
+                        
+                        manager.requestImage(for: asset, targetSize: CGSize(width: 500, height: 500), contentMode: .aspectFill, options: options) { result, _ in
+                            if let img = result {
+                                self.selectedImages.append(img)
+                            }
+                        }
+                        continue
+                    }
+                    
+                    // 2. Fallback to Disk (Local File)
                     PhotoManager.shared.fetchImage(for: id) { image in
                         if let img = image {
                             self.selectedImages.append(img)

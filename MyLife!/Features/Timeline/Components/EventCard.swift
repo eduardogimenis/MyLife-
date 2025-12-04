@@ -1,10 +1,11 @@
 import SwiftUI
+import Photos
 
 struct EventCard: View {
     let event: LifeEvent
     var showImage: Bool = true
     @EnvironmentObject var themeManager: ThemeManager
-    @AppStorage("showThumbnails") private var showThumbnails = true
+
     
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -32,7 +33,7 @@ struct EventCard: View {
                 }
                 
                 // Photo Thumbnail
-                if showImage && showThumbnails, let photoID = event.photoIDs.first ?? event.photoID {
+                if showImage, let photoID = event.photoIDs.first ?? event.photoID {
                     ZStack(alignment: .bottomTrailing) {
                         AsyncPhotoView(photoID: photoID)
                             .frame(height: 120)
@@ -93,13 +94,41 @@ struct AsyncPhotoView: View {
             }
         }
         .onAppear {
-            // Use the new synchronous load for disk images, or async wrapper
-            DispatchQueue.global(qos: .userInitiated).async {
-                let loadedImage = PhotoManager.shared.loadImage(filename: photoID)
-                DispatchQueue.main.async {
-                    withAnimation {
-                        self.image = loadedImage
+            loadPhoto()
+        }
+    }
+    
+    private func loadPhoto() {
+        // 1. Try loading from PhotoKit (for imported assets)
+        let assets = PHAsset.fetchAssets(withLocalIdentifiers: [photoID], options: nil)
+        if let asset = assets.firstObject {
+            let manager = PHImageManager.default()
+            let options = PHImageRequestOptions()
+            options.isSynchronous = false // Async for UI
+            options.deliveryMode = .opportunistic
+            options.isNetworkAccessAllowed = true
+            
+            // Request a reasonable size (e.g., 500px)
+            let targetSize = CGSize(width: 500, height: 500)
+            
+            manager.requestImage(for: asset, targetSize: targetSize, contentMode: .aspectFill, options: options) { result, _ in
+                if let result = result {
+                    DispatchQueue.main.async {
+                        withAnimation {
+                            self.image = result
+                        }
                     }
+                }
+            }
+            return
+        }
+        
+        // 2. Fallback to Disk (for manually added assets)
+        DispatchQueue.global(qos: .userInitiated).async {
+            let loadedImage = PhotoManager.shared.loadImage(filename: photoID)
+            DispatchQueue.main.async {
+                withAnimation {
+                    self.image = loadedImage
                 }
             }
         }

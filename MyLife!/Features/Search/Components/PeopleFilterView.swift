@@ -55,7 +55,7 @@ struct PersonFilterChip: View {
                 Text(person.name)
                 if let count = count {
                     Text("\(count)")
-                        .font(.system(size: 10, weight: .bold))
+                        .font(.caption2.weight(.bold))
                         .opacity(0.8)
                 }
             }

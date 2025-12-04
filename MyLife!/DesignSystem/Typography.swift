@@ -1,10 +1,10 @@
 import SwiftUI
 
 extension Font {
-    static let hero = Font.system(size: 34, weight: .bold, design: .rounded)
-    static let sectionHeader = Font.system(size: 22, weight: .semibold, design: .rounded)
-    static let bodyText = Font.system(size: 17, weight: .regular, design: .default)
-    static let captionText = Font.system(size: 13, weight: .medium, design: .default)
+    static let hero = Font.system(.largeTitle, design: .rounded).weight(.bold)
+    static let sectionHeader = Font.system(.title2, design: .rounded).weight(.semibold)
+    static let bodyText = Font.system(.body, design: .default).weight(.regular)
+    static let captionText = Font.system(.caption, design: .default).weight(.medium)
 }
 
 struct TypographyPreview: View {

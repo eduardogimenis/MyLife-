@@ -12,7 +12,7 @@ enum SettingsDestination: Hashable {
 struct SettingsView: View {
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var tourManager: TourManager
-    @AppStorage("showThumbnails") private var showThumbnails = true
+
     @State private var navigationPath = NavigationPath()
     @State private var isFlashing = false
     
@@ -29,12 +29,7 @@ struct SettingsView: View {
                                 .textContrast()
                         }
                         
-                        Toggle(isOn: $showThumbnails) {
-                            Label("Show Event Thumbnails", systemImage: "photo")
-                                .foregroundColor(themeManager.contrastingTextColor)
-                                .textContrast()
-                        }
-                        .tint(Color.theme.accent)
+
                     }
                     .listRowBackground(Color.clear)
                     .disabled(isRestricted())

@@ -7,6 +7,7 @@ struct TimelineView: View {
     @Query(sort: \LifeEvent.date, order: .reverse) private var events: [LifeEvent]
     
     @State private var showingAddEvent = false
+    @State private var showingInbox = false
     @State private var showingSetupWizard = false
     @State private var selectedEvent: LifeEvent?
     @State private var headerOffset: CGFloat = 0
@@ -37,19 +38,16 @@ struct TimelineView: View {
                 VStack(spacing: 0) {
                     if events.isEmpty {
                         emptyStateView
-                            .toolbar {
-                                ToolbarItem(placement: .topBarLeading) {
-                                    Button(action: { showingAddEvent = true }) {
-                                        Image(systemName: "plus")
-                                    }
-                                }
-                            }
+
                     } else {
                         timelineContent
                     }
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
+            .navigationDestination(isPresented: $showingInbox) {
+                InboxView()
+            }
         }
         .sheet(isPresented: $showingAddEvent) {
             AddEventView()
@@ -57,6 +55,7 @@ struct TimelineView: View {
         .sheet(isPresented: $showingSetupWizard) {
             SetupWizardView()
         }
+
     }
     
     private var emptyStateView: some View {
@@ -101,18 +100,32 @@ struct TimelineView: View {
                     HStack(alignment: .top) {
                         VStack(alignment: .leading, spacing: 0) {
                             Text("MyLife!")
-                                .font(.system(size: 40, weight: .bold, design: .serif))
+                                .font(.system(.largeTitle, design: .serif).weight(.bold))
                                 .foregroundColor(themeManager.contrastingTextColor)
                                 .textContrast()
                             
                             Text("The Journey So Far")
-                                .font(.system(size: 13, weight: .medium, design: .serif))
+                                .font(.system(.footnote, design: .serif).weight(.medium))
                                 .italic()
                                 .foregroundColor(themeManager.contrastingTextColor.opacity(0.7))
                                 .textContrast()
                         }
                         
                         Spacer()
+                        
+                        Button(action: {
+                            print("DEBUG: Inbox button tapped")
+                            showingInbox = true
+                        }) {
+                            Image(systemName: "tray.full.fill")
+                                .font(.title3)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                                .frame(width: 44, height: 44)
+                                .background(themeManager.accentColor)
+                                .clipShape(Circle())
+                                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+                        }
                         
                         Button(action: { showingAddEvent = true }) {
                             Image(systemName: "plus")
@@ -162,7 +175,7 @@ struct TimelineView: View {
                         }
                     }) {
                         Image(systemName: "arrow.up")
-                            .font(.system(size: 20, weight: .bold))
+                            .font(.title3.weight(.bold))
                             .foregroundColor(themeManager.contrastingTextColor)
                             .padding(12)
                             .background(.ultraThinMaterial)
@@ -231,7 +244,7 @@ private struct MonthRowView: View {
                 }
                 
                 Text(month.prefix(3).uppercased())
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .font(.system(.subheadline, design: .rounded).weight(.bold))
                     .foregroundColor(themeManager.contrastingTextColor.opacity(0.6))
                     .textContrast()
             }
