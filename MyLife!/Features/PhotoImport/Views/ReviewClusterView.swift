@@ -12,69 +12,111 @@ struct ReviewClusterView: View {
     @State private var selectedAssets: Set<String> = []
     @State private var selectedCategory: EventCategory = .travel
     @State private var userNotes: String = ""
-    @State private var gridColumns = [GridItem(.adaptive(minimum: 100), spacing: 2)]
+    @State private var gridColumns = [GridItem(.adaptive(minimum: 90), spacing: 4)]
     
     var body: some View {
         VStack(spacing: 0) {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 24) {
                     // Header Info
                     VStack(alignment: .leading, spacing: 4) {
                         Text(draft.locationName ?? "Unknown Location")
-                            .font(.title2)
+                            .font(.largeTitle)
                             .fontWeight(.bold)
                             .foregroundColor(themeManager.contrastingTextColor)
                         
                         Text(draft.date.formatted(date: .long, time: .omitted))
-                            .font(.subheadline)
-                            .foregroundColor(themeManager.contrastingTextColor.opacity(0.8))
-                        
-                        Picker("Category", selection: $selectedCategory) {
-                            ForEach(EventCategory.allCases, id: \.self) { category in
-                                Text(category.rawValue).tag(category)
-                            }
-                        }
-                        .pickerStyle(.menu)
-                        .padding(.top, 8)
-                        
-                        TextField("Add a note...", text: $userNotes)
-                            .textFieldStyle(.roundedBorder)
-                            .padding(.top, 4)
-                        
-                        if let existingNotes = draft.notes {
-                            Text(existingNotes)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .padding(.top, 4)
-                        }
+                            .font(.title3)
+                            .foregroundColor(themeManager.contrastingTextColor.opacity(0.7))
                     }
                     .padding(.horizontal)
                     .padding(.top)
                     
-                    // Photo Grid
-                    LazyVGrid(columns: gridColumns, spacing: 2) {
-                        ForEach(draft.assetIdentifiers, id: \.self) { assetID in
-                            // Placeholder for actual image fetching
-                            // In real app, use PHAsset.fetchAssets(withLocalIdentifiers: ...)
-                            AssetThumbnail(assetIdentifier: assetID)
-                                .aspectRatio(1, contentMode: .fill)
-                                .clipped()
-                                .overlay(
-                                    ZStack {
-                                        if selectedAssets.contains(assetID) {
-                                            Color.black.opacity(0.3)
-                                            Image(systemName: "checkmark.circle.fill")
-                                                .font(.title2)
-                                                .foregroundColor(.white)
-                                        }
-                                    }
-                                )
-                                .onTapGesture {
-                                    toggleSelection(assetID)
+                    // Category Section
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Category")
+                            .font(.headline)
+                            .foregroundColor(themeManager.contrastingTextColor)
+                        
+                        HStack {
+                            Image(systemName: selectedCategory.iconName)
+                                .foregroundColor(selectedCategory.color)
+                            Picker("Category", selection: $selectedCategory) {
+                                ForEach(EventCategory.allCases, id: \.self) { category in
+                                    Text(category.rawValue).tag(category)
                                 }
+                            }
+                            .pickerStyle(.menu)
+                            .tint(themeManager.contrastingTextColor)
+                            Spacer()
+                        }
+                        .padding()
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(12)
+                    }
+                    .padding(.horizontal)
+                    
+                    // Note Section
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Note")
+                            .font(.headline)
+                            .foregroundColor(themeManager.contrastingTextColor)
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            TextField("Add a note...", text: $userNotes, axis: .vertical)
+                                .textFieldStyle(.plain)
+                                .padding()
+                                .background(Color.gray.opacity(0.1))
+                                .cornerRadius(12)
+                            
+                            if let existingNotes = draft.notes {
+                                Text(existingNotes)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .padding(.horizontal, 4)
+                            }
                         }
                     }
+                    .padding(.horizontal)
+                    
+                    // Photos Section
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Select Photos")
+                                .font(.headline)
+                                .foregroundColor(themeManager.contrastingTextColor)
+                            Spacer()
+                            Text("\(selectedAssets.count) selected")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.horizontal)
+                        
+                        LazyVGrid(columns: gridColumns, spacing: 4) {
+                            ForEach(draft.assetIdentifiers, id: \.self) { assetID in
+                                AssetThumbnail(assetIdentifier: assetID)
+                                    .aspectRatio(1, contentMode: .fill)
+                                    .clipped()
+                                    .cornerRadius(4)
+                                    .overlay(
+                                        ZStack {
+                                            if selectedAssets.contains(assetID) {
+                                                Color.black.opacity(0.3)
+                                                Image(systemName: "checkmark.circle.fill")
+                                                    .font(.title2)
+                                                    .foregroundColor(.white)
+                                            }
+                                        }
+                                    )
+                                    .onTapGesture {
+                                        toggleSelection(assetID)
+                                    }
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
                 }
+                .padding(.bottom, 100) // Space for bottom bar
             }
             
             // Bottom Bar

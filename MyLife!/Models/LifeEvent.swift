@@ -57,4 +57,15 @@ enum EventCategory: String, CaseIterable, Codable {
         case .relationship: return Color.pink // Fallback or add to theme
         }
     }
+    
+    var iconName: String {
+        switch self {
+        case .work: return "briefcase.fill"
+        case .education: return "graduationcap.fill"
+        case .living: return "house.fill"
+        case .travel: return "airplane"
+        case .event: return "star.fill"
+        case .relationship: return "heart.fill"
+        }
+    }
 }
