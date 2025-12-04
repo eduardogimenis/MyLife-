@@ -21,6 +21,7 @@ struct PeopleListView: View {
                                 .font(.title2)
                             Text(person.name)
                                 .font(.body)
+                                .textContrast()
                         }
                         .contentShape(Rectangle())
                         .onTapGesture {

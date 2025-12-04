@@ -21,25 +21,28 @@ struct SettingsView: View {
                 themeManager.backgroundView()
                 
                 Form {
-                    Section(header: Text("Timeline Appearance").foregroundColor(themeManager.contrastingTextColor)) {
+                    Section(header: Text("Timeline Appearance").foregroundColor(themeManager.contrastingTextColor).textContrast()) {
                         NavigationLink(value: SettingsDestination.appearance) {
                             Label("Appearance", systemImage: "paintpalette")
                                 .foregroundColor(themeManager.contrastingTextColor)
+                                .textContrast()
                         }
                         
                         Toggle(isOn: $showThumbnails) {
                             Label("Show Event Thumbnails", systemImage: "photo")
                                 .foregroundColor(themeManager.contrastingTextColor)
+                                .textContrast()
                         }
                         .tint(Color.theme.accent)
                     }
                     .listRowBackground(Color.clear)
                     
-                    Section(header: Text("Data Management").foregroundColor(themeManager.contrastingTextColor)) {
+                    Section(header: Text("Data Management").foregroundColor(themeManager.contrastingTextColor).textContrast()) {
                         NavigationLink(value: SettingsDestination.categories) {
                             HStack {
                                 Label("Manage Categories", systemImage: "tag")
                                     .foregroundColor(themeManager.contrastingTextColor)
+                                    .textContrast()
                                 
                                 if tourManager.currentStep == .settingsHighlightCategories {
                                     Spacer()
@@ -49,7 +52,7 @@ struct SettingsView: View {
                                         .foregroundColor(Color.theme.accent)
                                         .padding(.horizontal, 8)
                                         .padding(.vertical, 4)
-                                        .background(Color.theme.accent.opacity(0.2))
+                                        .background(Color.theme.accent.opacity(0.6))
                                         .cornerRadius(8)
                                 }
                             }
@@ -60,6 +63,7 @@ struct SettingsView: View {
                             HStack {
                                 Label("Manage People", systemImage: "person.2")
                                     .foregroundColor(themeManager.contrastingTextColor)
+                                    .textContrast()
                                 
                                 if tourManager.currentStep == .settingsHighlightPeople {
                                     Spacer()
@@ -69,7 +73,7 @@ struct SettingsView: View {
                                         .foregroundColor(Color.theme.accent)
                                         .padding(.horizontal, 8)
                                         .padding(.vertical, 4)
-                                        .background(Color.theme.accent.opacity(0.2))
+                                        .background(Color.theme.accent.opacity(0.6))
                                         .cornerRadius(8)
                                 }
                             }
@@ -79,17 +83,20 @@ struct SettingsView: View {
                         NavigationLink(value: SettingsDestination.data) {
                             Label("Import / Export JSON", systemImage: "arrow.up.arrow.down")
                                 .foregroundColor(themeManager.contrastingTextColor)
+                                .textContrast()
                         }
                     }
                     .listRowBackground(Color.clear)
                     
-                    Section(header: Text("About").foregroundColor(themeManager.contrastingTextColor)) {
+                    Section(header: Text("About").foregroundColor(themeManager.contrastingTextColor).textContrast()) {
                         HStack {
                             Label("Version", systemImage: "info.circle")
                                 .foregroundColor(themeManager.contrastingTextColor)
+                                .textContrast()
                             Spacer()
                             Text("0.2.0")
                                 .foregroundColor(themeManager.contrastingTextColor.opacity(0.7))
+                                .textContrast()
                         }
                     }
                     .listRowBackground(Color.clear)

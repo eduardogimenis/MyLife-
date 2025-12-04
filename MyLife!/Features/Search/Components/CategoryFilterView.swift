@@ -69,15 +69,15 @@ struct FilterChip: View {
                     if isSelected {
                         color
                     } else {
-                        Color.theme.cardBackground
+                        Color.black.opacity(0.6)
                     }
                 }
             )
-            .foregroundColor(isSelected ? .white : .primary)
+            .foregroundColor(.white)
             .cornerRadius(20)
             .overlay(
                 RoundedRectangle(cornerRadius: 20)
-                    .stroke(isSelected ? color : Color.gray.opacity(0.3), lineWidth: 1)
+                    .stroke(isSelected ? color : Color.white.opacity(0.3), lineWidth: 1)
             )
         }
     }

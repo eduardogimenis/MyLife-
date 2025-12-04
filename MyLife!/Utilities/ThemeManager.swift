@@ -10,7 +10,7 @@ class ThemeManager: ObservableObject {
     // MARK: - Enums
     
     enum AppAccentColor: String, CaseIterable, Identifiable {
-        case blue, purple, pink, orange, teal, green
+        case blue, purple, pink, orange, green, custom
         var id: String { rawValue }
         
         var color: Color {
@@ -19,8 +19,8 @@ class ThemeManager: ObservableObject {
             case .purple: return .purple
             case .pink: return .pink
             case .orange: return .orange
-            case .teal: return .teal
             case .green: return .green
+            case .custom: return .clear // Handled dynamically
             }
         }
     }
@@ -121,6 +121,23 @@ class ThemeManager: ObservableObject {
     
     @Published var customBackgroundA: Double {
         didSet { UserDefaults.standard.set(customBackgroundA, forKey: "appCustomBackgroundA") }
+    }
+    
+    // Custom Accent Color Storage
+    @Published var customAccentR: Double {
+        didSet { UserDefaults.standard.set(customAccentR, forKey: "appCustomAccentR") }
+    }
+    
+    @Published var customAccentG: Double {
+        didSet { UserDefaults.standard.set(customAccentG, forKey: "appCustomAccentG") }
+    }
+    
+    @Published var customAccentB: Double {
+        didSet { UserDefaults.standard.set(customAccentB, forKey: "appCustomAccentB") }
+    }
+    
+    @Published var customAccentA: Double {
+        didSet { UserDefaults.standard.set(customAccentA, forKey: "appCustomAccentA") }
     }
     
     var backgroundBlurRadius: Double {
@@ -241,6 +258,16 @@ class ThemeManager: ObservableObject {
             self.customBackgroundA = UserDefaults.standard.double(forKey: "appCustomBackgroundA")
         }
         
+        self.customAccentR = UserDefaults.standard.double(forKey: "appCustomAccentR")
+        self.customAccentG = UserDefaults.standard.double(forKey: "appCustomAccentG")
+        self.customAccentB = UserDefaults.standard.double(forKey: "appCustomAccentB")
+        
+        if UserDefaults.standard.object(forKey: "appCustomAccentA") == nil {
+            self.customAccentA = 1.0
+        } else {
+            self.customAccentA = UserDefaults.standard.double(forKey: "appCustomAccentA")
+        }
+        
         loadBackgroundImage()
     }
     
@@ -265,7 +292,31 @@ class ThemeManager: ObservableObject {
     }
     
     var accentColor: Color {
-        AppAccentColor(rawValue: accentColorRaw)?.color ?? .blue
+        let type = AppAccentColor(rawValue: accentColorRaw) ?? .blue
+        if type == .custom {
+            return customAccentColor
+        }
+        return type.color
+    }
+    
+    var customAccentColor: Color {
+        Color(red: customAccentR, green: customAccentG, blue: customAccentB, opacity: customAccentA)
+    }
+    
+    func setCustomAccentColor(_ color: Color) {
+        let uic = UIColor(color)
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        
+        if uic.getRed(&r, green: &g, blue: &b, alpha: &a) {
+            objectWillChange.send()
+            customAccentR = Double(r)
+            customAccentG = Double(g)
+            customAccentB = Double(b)
+            customAccentA = Double(a)
+        }
     }
     
     var backgroundStyle: BackgroundStyle {
@@ -376,24 +427,31 @@ class ThemeManager: ObservableObject {
         let icon: String
         let imageName: String
         let accentColor: AppAccentColor
+        let customAccentColor: Color? // For themes that use a specific custom color (e.g. Brown, Gray)
         let backgroundStyle: BackgroundStyle
         let customColor: Color
         let fontDesign: FontDesign
         
         static let allPresets: [ThemePreset] = [
-            ThemePreset(name: "Default", icon: "iphone", imageName: "", accentColor: .blue, backgroundStyle: .solid, customColor: .black, fontDesign: .default),
-            ThemePreset(name: "Forest", icon: "tree.fill", imageName: "theme_forest", accentColor: .green, backgroundStyle: .image, customColor: Color(red: 0.1, green: 0.3, blue: 0.1), fontDesign: .rounded),
-            ThemePreset(name: "Floral", icon: "leaf.fill", imageName: "theme_floral", accentColor: .pink, backgroundStyle: .image, customColor: Color(red: 1.0, green: 0.9, blue: 0.95), fontDesign: .serif),
-            ThemePreset(name: "Urban", icon: "building.2.fill", imageName: "theme_urban", accentColor: .teal, backgroundStyle: .image, customColor: Color(red: 0.2, green: 0.2, blue: 0.25), fontDesign: .monospaced),
-            ThemePreset(name: "Travel", icon: "airplane", imageName: "theme_travel", accentColor: .blue, backgroundStyle: .image, customColor: Color(red: 0.85, green: 0.95, blue: 1.0), fontDesign: .default),
-            ThemePreset(name: "Car", icon: "car.fill", imageName: "theme_car", accentColor: .orange, backgroundStyle: .image, customColor: Color(red: 0.1, green: 0.1, blue: 0.1), fontDesign: .default),
-            ThemePreset(name: "Art", icon: "paintpalette.fill", imageName: "theme_art", accentColor: .purple, backgroundStyle: .image, customColor: Color(red: 0.2, green: 0.1, blue: 0.3), fontDesign: .serif),
-            ThemePreset(name: "Family", icon: "figure.2.and.child.holdinghands", imageName: "theme_family", accentColor: .orange, backgroundStyle: .image, customColor: Color(red: 1.0, green: 0.95, blue: 0.8), fontDesign: .rounded)
+            ThemePreset(name: "Default", icon: "iphone", imageName: "", accentColor: .blue, customAccentColor: nil, backgroundStyle: .solid, customColor: .black, fontDesign: .default),
+            ThemePreset(name: "Forest", icon: "tree.fill", imageName: "theme_forest", accentColor: .green, customAccentColor: nil, backgroundStyle: .image, customColor: Color(red: 0.1, green: 0.3, blue: 0.1), fontDesign: .rounded),
+            ThemePreset(name: "Floral", icon: "leaf.fill", imageName: "theme_floral", accentColor: .pink, customAccentColor: nil, backgroundStyle: .image, customColor: Color(red: 1.0, green: 0.9, blue: 0.95), fontDesign: .serif),
+            ThemePreset(name: "Urban", icon: "building.2.fill", imageName: "theme_urban", accentColor: .custom, customAccentColor: .teal, backgroundStyle: .image, customColor: Color(red: 0.2, green: 0.2, blue: 0.25), fontDesign: .monospaced),
+            ThemePreset(name: "Travel", icon: "airplane", imageName: "theme_travel", accentColor: .custom, customAccentColor: .brown, backgroundStyle: .image, customColor: Color(red: 0.85, green: 0.95, blue: 1.0), fontDesign: .default),
+            ThemePreset(name: "Car", icon: "car.fill", imageName: "theme_car", accentColor: .custom, customAccentColor: .gray, backgroundStyle: .image, customColor: Color(red: 0.1, green: 0.1, blue: 0.1), fontDesign: .default),
+            ThemePreset(name: "Art", icon: "paintpalette.fill", imageName: "theme_art", accentColor: .purple, customAccentColor: nil, backgroundStyle: .image, customColor: Color(red: 0.2, green: 0.1, blue: 0.3), fontDesign: .serif),
+            ThemePreset(name: "Family", icon: "figure.2.and.child.holdinghands", imageName: "theme_family", accentColor: .orange, customAccentColor: nil, backgroundStyle: .image, customColor: Color(red: 1.0, green: 0.95, blue: 0.8), fontDesign: .rounded)
         ]
     }
     
     func apply(preset: ThemePreset) {
         self.accentColorRaw = preset.accentColor.rawValue
+        
+        // Apply custom accent color if specified
+        if preset.accentColor == .custom, let customAccent = preset.customAccentColor {
+            self.setCustomAccentColor(customAccent)
+        }
+        
         self.backgroundStyleRaw = preset.backgroundStyle.rawValue
         self.fontDesignRaw = preset.fontDesign.rawValue
         
@@ -407,8 +465,8 @@ class ThemeManager: ObservableObject {
             self.backgroundTintR = Double(UIColor(preset.customColor).cgColor.components?[0] ?? 0)
             self.backgroundTintG = Double(UIColor(preset.customColor).cgColor.components?[1] ?? 0)
             self.backgroundTintB = Double(UIColor(preset.customColor).cgColor.components?[2] ?? 0)
-            self.backgroundTintOpacity = 0.3
-            self.backgroundBlurRadius = 4
+            self.backgroundTintOpacity = 0.35
+            self.backgroundBlurRadius = 5
         } else {
             // Fallback if image missing
             self.backgroundImage = nil

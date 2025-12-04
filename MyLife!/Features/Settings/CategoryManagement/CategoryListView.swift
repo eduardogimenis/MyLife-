@@ -20,6 +20,7 @@ struct CategoryListView: View {
                         
                         Text(category.name)
                             .font(.headline)
+                            .textContrast()
                         
                         Spacer()
                         
@@ -31,6 +32,7 @@ struct CategoryListView: View {
                                 .padding(.vertical, 4)
                                 .background(Color.gray.opacity(0.1))
                                 .cornerRadius(4)
+                                .textContrast()
                         }
                     }
                     .contentShape(Rectangle())

@@ -48,21 +48,6 @@ struct TimelineView: View {
                         timelineContent
                     }
                 }
-                
-                // Status Bar Shade
-                VStack {
-                    LinearGradient(
-                        colors: [Color.black.opacity(0.8), Color.clear],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .frame(height: 100)
-                    .opacity(min(1, max(0, (-headerOffset) / 60)))
-                    .allowsHitTesting(false)
-                    
-                    Spacer()
-                }
-                .ignoresSafeArea()
             }
             .toolbar(.hidden, for: .navigationBar)
         }
@@ -118,11 +103,13 @@ struct TimelineView: View {
                             Text("MyLife!")
                                 .font(.system(size: 40, weight: .bold, design: .serif))
                                 .foregroundColor(themeManager.contrastingTextColor)
+                                .textContrast()
                             
                             Text("The Journey So Far")
                                 .font(.system(size: 13, weight: .medium, design: .serif))
                                 .italic()
                                 .foregroundColor(themeManager.contrastingTextColor.opacity(0.7))
+                                .textContrast()
                         }
                         
                         Spacer()
@@ -240,11 +227,13 @@ private struct MonthRowView: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                         .padding(.bottom, 2)
+                        .textContrast()
                 }
                 
                 Text(month.prefix(3).uppercased())
                     .font(.system(size: 14, weight: .bold, design: .rounded))
                     .foregroundColor(themeManager.contrastingTextColor.opacity(0.6))
+                    .textContrast()
             }
             .frame(width: 60, alignment: .trailing)
             .padding(.top, 6)

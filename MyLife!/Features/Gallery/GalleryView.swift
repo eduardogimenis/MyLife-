@@ -79,6 +79,7 @@ struct GalleryView: View {
                                             .fontWeight(.bold)
                                             .foregroundColor(themeManager.contrastingTextColor)
                                             .padding(.vertical, 8)
+                                            .textContrast()
                                         Spacer()
                                     }
                                 ) {
@@ -98,11 +99,13 @@ struct GalleryView: View {
                                                     .foregroundColor(themeManager.contrastingTextColor)
                                                     .frame(maxWidth: .infinity, alignment: .leading)
                                                     .padding(.top, 4)
+                                                    .textContrast()
                                                 
                                                 Text(event.date.formatted(date: .abbreviated, time: .omitted))
                                                     .font(.caption2)
                                                     .foregroundColor(themeManager.contrastingTextColor.opacity(0.7))
                                                     .frame(maxWidth: .infinity, alignment: .leading)
+                                                    .textContrast()
                                             }
                                             .onTapGesture {
                                                 navigationPath.append(event)

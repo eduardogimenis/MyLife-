@@ -67,6 +67,7 @@ struct SearchView: View {
                             Text("\(filteredEvents.count) events found")
                                 .font(.caption)
                                 .foregroundColor(themeManager.contrastingTextColor.opacity(0.6))
+                                .textContrast()
                             Spacer()
                         }
                         .padding(.horizontal)

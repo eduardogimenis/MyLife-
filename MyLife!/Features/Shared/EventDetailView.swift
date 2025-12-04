@@ -40,6 +40,7 @@ struct EventDetailView: View {
                             .font(.largeTitle)
                             .fontWeight(.bold)
                             .foregroundColor(themeManager.contrastingTextColor)
+                            .textContrast()
                         
                         HStack {
                             Image(systemName: "calendar")
@@ -50,6 +51,7 @@ struct EventDetailView: View {
                             }
                         }
                         .foregroundColor(themeManager.contrastingTextColor.opacity(0.8))
+                        .textContrast()
                         
                         if let location = event.locationName {
                             HStack {
@@ -57,6 +59,7 @@ struct EventDetailView: View {
                                 Text(location)
                             }
                             .foregroundColor(themeManager.contrastingTextColor.opacity(0.8))
+                            .textContrast()
                         }
                         
                         if let notes = event.notes {
@@ -64,6 +67,7 @@ struct EventDetailView: View {
                                 .font(.body)
                                 .foregroundColor(themeManager.contrastingTextColor)
                                 .padding(.top, 8)
+                                .textContrast()
                         }
                         
                         // Category & People Tags
@@ -79,6 +83,7 @@ struct EventDetailView: View {
                                 .background(category.color.opacity(0.2))
                                 .foregroundColor(category.color)
                                 .cornerRadius(12)
+                                .textContrast()
                             }
                             
                             if let people = event.people {
@@ -92,6 +97,7 @@ struct EventDetailView: View {
                                     .padding(.vertical, 6)
                                     .background(Color.theme.cardBackground)
                                     .cornerRadius(12)
+                                    .textContrast()
                                 }
                             }
                         }

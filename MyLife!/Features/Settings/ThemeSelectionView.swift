@@ -68,10 +68,14 @@ struct ThemePresetCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     Image(systemName: preset.icon)
-                        .foregroundColor(preset.accentColor.color)
+                        .foregroundColor(preset.accentColor == .custom ? (preset.customAccentColor ?? .white) : preset.accentColor.color)
                     Spacer()
-                    if themeManager.accentColorRaw == preset.accentColor.rawValue && 
-                       themeManager.fontDesignRaw == preset.fontDesign.rawValue {
+                    
+                    let isSelected = themeManager.accentColorRaw == preset.accentColor.rawValue &&
+                                   themeManager.fontDesignRaw == preset.fontDesign.rawValue &&
+                                   (preset.accentColor != .custom || themeManager.customAccentColor == preset.customAccentColor)
+                    
+                    if isSelected {
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundColor(.white)
                     }
