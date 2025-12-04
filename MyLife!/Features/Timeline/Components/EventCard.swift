@@ -20,14 +20,14 @@ struct EventCard: View {
                 // Location removed to optimize space in timeline list
                 
                 if let endDate = event.endDate {
-                    Text("\(event.date.formatted(date: .abbreviated, time: .omitted)) - \(endDate.formatted(date: .abbreviated, time: .omitted))")
+                    Text("\(event.date.formatted(.dateTime.month(.abbreviated).day())) - \(endDate.formatted(.dateTime.month(.abbreviated).day()))")
                         .font(.caption2)
-                        .foregroundColor(Color.theme.accent)
+                        .foregroundColor(themeManager.contrastingTextColor.opacity(0.6))
                         .lineLimit(1)
                 } else {
-                    Text(event.date.formatted(date: .abbreviated, time: .omitted))
+                    Text(event.date.formatted(.dateTime.month(.abbreviated).day()))
                         .font(.caption2)
-                        .foregroundColor(Color.theme.accent)
+                        .foregroundColor(themeManager.contrastingTextColor.opacity(0.6))
                         .lineLimit(1)
                 }
                 
@@ -72,7 +72,7 @@ struct EventCard: View {
                 }
             }
         }
-        .glassCard()
+        .glassCard(tint: (event.categoryModel?.color ?? event.category.color).opacity(0.07))
     }
 }
 

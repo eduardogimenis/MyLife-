@@ -408,7 +408,7 @@ class ThemeManager: ObservableObject {
             self.backgroundTintG = Double(UIColor(preset.customColor).cgColor.components?[1] ?? 0)
             self.backgroundTintB = Double(UIColor(preset.customColor).cgColor.components?[2] ?? 0)
             self.backgroundTintOpacity = 0.3
-            self.backgroundBlurRadius = 0
+            self.backgroundBlurRadius = 4
         } else {
             // Fallback if image missing
             self.backgroundImage = nil

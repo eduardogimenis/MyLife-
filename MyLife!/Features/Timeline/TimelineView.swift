@@ -9,6 +9,7 @@ struct TimelineView: View {
     @State private var showingAddEvent = false
     @State private var showingSetupWizard = false
     @State private var selectedEvent: LifeEvent?
+    @State private var headerOffset: CGFloat = 0
     
     var groupedEvents: [(Int, [(String, [LifeEvent])])] {
         let groupedByYear = Dictionary(grouping: events) { event in
@@ -45,18 +46,25 @@ struct TimelineView: View {
                             }
                     } else {
                         timelineContent
-                            .toolbar {
-                                ToolbarItem(placement: .topBarTrailing) {
-                                    Button(action: { showingAddEvent = true }) {
-                                        Image(systemName: "plus")
-                                    }
-                                }
-                            }
                     }
                 }
+                
+                // Status Bar Shade
+                VStack {
+                    LinearGradient(
+                        colors: [Color.black.opacity(0.8), Color.clear],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: 100)
+                    .opacity(min(1, max(0, (-headerOffset) / 60)))
+                    .allowsHitTesting(false)
+                    
+                    Spacer()
+                }
+                .ignoresSafeArea()
             }
-            .navigationTitle(events.isEmpty ? "" : "MyLife!")
-            .toolbarColorScheme(themeManager.contrastingTextColor == .black ? .light : .dark, for: .navigationBar)
+            .toolbar(.hidden, for: .navigationBar)
         }
         .sheet(isPresented: $showingAddEvent) {
             AddEventView()
@@ -101,24 +109,89 @@ struct TimelineView: View {
     }
     
     private var timelineContent: some View {
-        ScrollView {
-            LazyVStack(spacing: 0) {
-                ForEach(groupedEvents, id: \.0) { year, months in
-                    VStack(spacing: 0) {
-                        ForEach(months, id: \.0) { monthData in
-                            MonthRowView(
-                                year: year,
-                                month: monthData.0,
-                                events: monthData.1,
-                                isFirstMonth: monthData.0 == months.first?.0
-                            )
+        ScrollViewReader { proxy in
+            ZStack(alignment: .bottom) {
+                ScrollView {
+                    // Editorial Header with Add Button
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text("MyLife!")
+                                .font(.system(size: 40, weight: .bold, design: .serif))
+                                .foregroundColor(themeManager.contrastingTextColor)
+                            
+                            Text("The Journey So Far")
+                                .font(.system(size: 13, weight: .medium, design: .serif))
+                                .italic()
+                                .foregroundColor(themeManager.contrastingTextColor.opacity(0.7))
+                        }
+                        
+                        Spacer()
+                        
+                        Button(action: { showingAddEvent = true }) {
+                            Image(systemName: "plus")
+                                .font(.title3)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                                .frame(width: 44, height: 44)
+                                .background(themeManager.accentColor)
+                                .clipShape(Circle())
+                                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+                        }
+                    }
+                    .id("timelineTop")
+                    .padding(.horizontal, 20)
+                    .padding(.top, 10)
+                    .padding(.bottom, 10)
+                    .background(GeometryReader { geo in
+                        Color.clear.preference(key: ScrollOffsetPreferenceKey.self, value: geo.frame(in: .named("scroll")).minY)
+                    })
+                    .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                        headerOffset = value
+                    }
+                    
+                    LazyVStack(spacing: 0) {
+                        ForEach(groupedEvents, id: \.0) { year, months in
+                            VStack(spacing: 0) {
+                                ForEach(months, id: \.0) { monthData in
+                                    MonthRowView(
+                                        year: year,
+                                        month: monthData.0,
+                                        events: monthData.1,
+                                        isFirstMonth: monthData.0 == months.first?.0
+                                    )
+                                }
+                            }
                         }
                     }
                 }
+                .coordinateSpace(name: "scroll")
+                .scrollContentBackground(.hidden)
+                
+                // Scroll to Top Button
+                if headerOffset < -600 {
+                    Button(action: {
+                        withAnimation {
+                            proxy.scrollTo("timelineTop", anchor: .top)
+                        }
+                    }) {
+                        Image(systemName: "arrow.up")
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(themeManager.contrastingTextColor)
+                            .padding(12)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Circle())
+                            .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+                            .overlay(
+                                Circle()
+                                    .stroke(themeManager.contrastingTextColor.opacity(0.1), lineWidth: 1)
+                            )
+                    }
+                    .padding(.bottom, 20)
+                    .opacity(0.8)
+                    .transition(.scale.combined(with: .opacity))
+                }
             }
-            .padding(.top)
         }
-        .scrollContentBackground(.hidden)
     }
     
     private func deleteEvent(_ event: LifeEvent) {
